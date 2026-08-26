@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Bridge English · Aprende inglés</title>
-<meta name="description" content="Practica vocabulario, gramática, lectura y pronunciación de inglés." />
+<meta name="description" content="Practica vocabulario, gramática, lectura, pronunciación y repaso inteligente de inglés." />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%89%3C/text%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -18,11 +18,29 @@
   body { font-family: 'Inter', sans-serif; background: #0D1117; }
   button { font-family: inherit; cursor: pointer; }
   button:disabled { cursor: default; }
+  button:active { transform: scale(0.97); }
   button:focus-visible, input:focus-visible { outline: 2px solid #2DD4BF; outline-offset: 2px; }
   ::-webkit-scrollbar { width: 10px; height: 10px; }
   ::-webkit-scrollbar-thumb { background: #2A3441; border-radius: 999px; }
+
   @keyframes shake { 10%,90%{transform:translateX(-1px)} 20%,80%{transform:translateX(2px)} 30%,50%,70%{transform:translateX(-4px)} 40%,60%{transform:translateX(4px)} }
   .shake { animation: shake .4s; }
+
+  @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .view-enter { animation: fadeSlideIn .4s ease both; }
+  .card-enter { animation: fadeSlideIn .45s ease both; }
+
+  @keyframes pop { 0% { transform: scale(.85); opacity: 0; } 60% { transform: scale(1.04); } 100% { transform: scale(1); opacity: 1; } }
+  .pop { animation: pop .35s ease both; }
+
+  .flip-card { perspective: 1200px; }
+  .flip-inner { position: relative; width: 100%; transition: transform .5s cubic-bezier(.4,.2,.2,1); transform-style: preserve-3d; }
+  .flip-inner.is-flipped { transform: rotateY(180deg); }
+  .flip-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+  .flip-back { transform: rotateY(180deg); }
+
+  .progress-fill { transition: width .6s cubic-bezier(.4,.2,.2,1); }
+
   @media (prefers-reduced-motion: reduce) {
     * { transition: none !important; animation: none !important; }
   }
@@ -83,9 +101,11 @@ const IconCloud = (p) => <Icon {...p}><path d="M7 18a4.5 4.5 0 0 1-.5-9 5.5 5.5 
 const IconFlame = (p) => <Icon {...p}><path d="M12 2c1 3-2 4-2 7a4 4 0 0 0 8 0c0-1-.5-2-1-3 1 0 3 2 3 6a6 6 0 0 1-12 0c0-4 2-6 4-10Z"/></Icon>;
 const IconX = (p) => <Icon {...p}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></Icon>;
 const IconShuffle = (p) => <Icon {...p}><path d="M4 6h4l9 12h3"/><path d="M4 18h4l3-4"/><path d="M14 6h6M20 6l-3-3M20 6l-3 3"/><path d="M20 18l-3-3M20 18l-3 3"/></Icon>;
+const IconChecklist = (p) => <Icon {...p}><rect x="4" y="4" width="4" height="4" rx="1"/><line x1="11" y1="6" x2="20" y2="6"/><rect x="4" y="10" width="4" height="4" rx="1"/><line x1="11" y1="12" x2="20" y2="12"/><rect x="4" y="16" width="4" height="4" rx="1"/><line x1="11" y1="18" x2="20" y2="18"/></Icon>;
+const IconClock = (p) => <Icon {...p}><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></Icon>;
 
 /* ================================================================ */
-/* CONTENIDO — VOCABULARIO (10 categorías × 10 palabras)             */
+/* CONTENIDO — VOCABULARIO (14 categorías × 10 palabras)             */
 /* ================================================================ */
 
 const VOCAB_CATEGORIES = [
@@ -209,10 +229,58 @@ const VOCAB_CATEGORIES = [
     { en: 'Coat', es: 'Abrigo', example: 'Put on your coat.' },
     { en: 'Scarf', es: 'Bufanda', example: 'She wears a scarf in winter.' },
   ]},
+  { id: 'clima', name: 'Clima', accent: COLORS.rose, words: [
+    { en: 'Sun', es: 'Sol', example: 'The sun is very bright today.' },
+    { en: 'Rain', es: 'Lluvia', example: 'I love the sound of rain.' },
+    { en: 'Cloud', es: 'Nube', example: 'There is one white cloud in the sky.' },
+    { en: 'Wind', es: 'Viento', example: 'The wind is very strong today.' },
+    { en: 'Snow', es: 'Nieve', example: 'It snows a lot in winter.' },
+    { en: 'Storm', es: 'Tormenta', example: 'A storm is coming tonight.' },
+    { en: 'Hot', es: 'Caliente', example: 'It is very hot in summer.' },
+    { en: 'Cold', es: 'Frío', example: 'The water is too cold.' },
+    { en: 'Weather', es: 'Clima', example: 'The weather is beautiful today.' },
+    { en: 'Temperature', es: 'Temperatura', example: 'The temperature is twenty degrees.' },
+  ]},
+  { id: 'ciudad', name: 'Ciudad y lugares', accent: COLORS.amber, words: [
+    { en: 'City', es: 'Ciudad', example: 'I live in a big city.' },
+    { en: 'Street', es: 'Calle', example: 'My house is on a quiet street.' },
+    { en: 'Park', es: 'Parque', example: 'We walked in the park.' },
+    { en: 'Store', es: 'Tienda', example: 'The store is open until nine.' },
+    { en: 'Bank', es: 'Banco', example: 'I need to go to the bank.' },
+    { en: 'School', es: 'Escuela', example: 'My children go to school by bus.' },
+    { en: 'Church', es: 'Iglesia', example: 'The church is very old.' },
+    { en: 'Bridge', es: 'Puente', example: 'We crossed the bridge on foot.' },
+    { en: 'Museum', es: 'Museo', example: 'The museum has beautiful paintings.' },
+    { en: 'Library', es: 'Biblioteca', example: 'She studies at the library every day.' },
+  ]},
+  { id: 'tecnologia', name: 'Tecnología', accent: COLORS.teal, words: [
+    { en: 'Computer', es: 'Computadora', example: 'I work on my computer every day.' },
+    { en: 'Phone', es: 'Teléfono', example: 'My phone battery is low.' },
+    { en: 'Internet', es: 'Internet', example: "We don't have internet at home." },
+    { en: 'Password', es: 'Contraseña', example: 'I forgot my password.' },
+    { en: 'Screen', es: 'Pantalla', example: 'The screen is too small.' },
+    { en: 'Battery', es: 'Batería', example: 'The battery lasts all day.' },
+    { en: 'Application', es: 'Aplicación', example: 'I downloaded a new application.' },
+    { en: 'Camera', es: 'Cámara', example: 'This camera takes great photos.' },
+    { en: 'Keyboard', es: 'Teclado', example: 'My keyboard is not working.' },
+    { en: 'Charger', es: 'Cargador', example: 'Can I borrow your charger?' },
+  ]},
+  { id: 'deportes', name: 'Deportes', accent: COLORS.indigo, words: [
+    { en: 'Soccer', es: 'Fútbol', example: 'He plays soccer every weekend.' },
+    { en: 'Basketball', es: 'Baloncesto', example: 'She is very good at basketball.' },
+    { en: 'Swimming', es: 'Natación', example: 'Swimming is great exercise.' },
+    { en: 'Run', es: 'Correr', example: 'I run every morning.' },
+    { en: 'Team', es: 'Equipo', example: 'Our team won the game.' },
+    { en: 'Ball', es: 'Pelota', example: 'Pass me the ball!' },
+    { en: 'Win', es: 'Ganar', example: 'We want to win this game.' },
+    { en: 'Lose', es: 'Perder', example: 'Nobody likes to lose.' },
+    { en: 'Game', es: 'Partido', example: 'The game starts at seven.' },
+    { en: 'Exercise', es: 'Ejercicio', example: 'Exercise is good for your health.' },
+  ]},
 ];
 
 /* ================================================================ */
-/* CONTENIDO — GRAMÁTICA (10 lecciones × 4 preguntas)                */
+/* CONTENIDO — GRAMÁTICA (14 lecciones × 4 preguntas)                */
 /* ================================================================ */
 
 const GRAMMAR_LESSONS = [
@@ -316,6 +384,46 @@ const GRAMMAR_LESSONS = [
       { text: 'They ___ pizza last night.', options: ['eat', 'ate', 'eated'], answer: 1 },
       { text: 'We ___ a great movie.', options: ['see', 'saw', 'seed'], answer: 1 },
     ]},
+  { id: 'futuro', title: 'Futuro: will / going to',
+    explanation: "Usamos 'will' para decisiones espontáneas o promesas, y 'going to' para planes ya decididos.",
+    conjugation: ['I will go', 'I am going to go'],
+    examples: ['I will call you later.', 'She is going to travel next month.', 'It will rain tomorrow.', 'We are going to buy a new car.'],
+    questions: [
+      { text: 'Look at those clouds! It ___ rain.', options: ['will', 'is going to', 'are'], answer: 1 },
+      { text: 'I ___ help you with your bags.', options: ['am going to', 'will', 'are'], answer: 1 },
+      { text: 'We ___ visit Paris. We already bought the tickets.', options: ['will', 'are going to', 'is'], answer: 1 },
+      { text: 'I promise I ___ call you tonight.', options: ['will', 'am going to', 'is'], answer: 0 },
+    ]},
+  { id: 'modales', title: 'Modales: can / could / should / must',
+    explanation: "'Can' expresa habilidad o permiso, 'could' es más formal, 'should' da consejos, y 'must' expresa obligación.",
+    conjugation: ['can (habilidad)', 'could (formal)', 'should (consejo)', 'must (obligación)'],
+    examples: ['I can swim.', 'Could you help me?', 'You should study more.', 'You must wear a seatbelt.'],
+    questions: [
+      { text: 'You ___ see a doctor if you feel sick.', options: ['must', 'should', 'can'], answer: 1 },
+      { text: '___ you pass me the salt, please?', options: ['Must', 'Could', 'Should'], answer: 1 },
+      { text: 'All passengers ___ show their passport.', options: ['should', 'could', 'must'], answer: 2 },
+      { text: 'She ___ speak three languages.', options: ['can', 'should', 'must'], answer: 0 },
+    ]},
+  { id: 'preposiciones-tiempo', title: 'Preposiciones de tiempo: in / on / at',
+    explanation: "Usa 'at' para horas exactas, 'on' para días y fechas, e 'in' para meses, años y periodos más largos.",
+    conjugation: ["at 5 o'clock", 'on Monday', 'in July'],
+    examples: ['I wake up at seven.', 'The party is on Saturday.', 'She was born in 1990.', 'We travel in summer.'],
+    questions: [
+      { text: 'The meeting is ___ Monday.', options: ['at', 'on', 'in'], answer: 1 },
+      { text: 'I have class ___ nine o\'clock.', options: ['at', 'on', 'in'], answer: 0 },
+      { text: 'He was born ___ March.', options: ['at', 'on', 'in'], answer: 2 },
+      { text: 'We will meet ___ the morning.', options: ['at', 'on', 'in'], answer: 2 },
+    ]},
+  { id: 'pasado-continuo', title: 'Pasado continuo',
+    explanation: "Describe una acción que estaba en curso en un momento del pasado. Se forma con 'was/were' + verbo + '-ing'.",
+    conjugation: ['I was -ing', 'You were -ing', 'He / She / It was -ing', 'We were -ing', 'They were -ing'],
+    examples: ['I was sleeping at midnight.', 'They were watching TV when I arrived.', 'She was cooking dinner.', 'We were studying all afternoon.'],
+    questions: [
+      { text: 'I ___ sleeping when the phone rang.', options: ['was', 'were', 'am'], answer: 0 },
+      { text: 'They ___ playing soccer at 5 PM.', options: ['was', 'were', 'is'], answer: 1 },
+      { text: 'She ___ cooking when I came home.', options: ['were', 'was', 'is'], answer: 1 },
+      { text: 'We ___ studying all night.', options: ['was', 'were', 'are'], answer: 1 },
+    ]},
 ];
 
 /* ================================================================ */
@@ -414,6 +522,44 @@ const SENTENCE_EXERCISES = [
 ];
 
 /* ================================================================ */
+/* CONTENIDO — TRADUCIR ESCRIBIENDO (12 frases)                      */
+/* ================================================================ */
+
+const TRANSLATION_ITEMS = [
+  { id: 't1', es: 'Tengo hambre.', en: ['I am hungry', "I'm hungry"] },
+  { id: 't2', es: 'Ella es mi amiga.', en: ['She is my friend', "She's my friend"] },
+  { id: 't3', es: 'Nosotros hablamos inglés.', en: ['We speak English'] },
+  { id: 't4', es: '¿Qué hora es?', en: ['What time is it'] },
+  { id: 't5', es: 'Hace frío hoy.', en: ['It is cold today', "It's cold today"] },
+  { id: 't6', es: '¿Dónde vives?', en: ['Where do you live'] },
+  { id: 't7', es: 'Necesito ayuda.', en: ['I need help'] },
+  { id: 't8', es: 'Ellos están en casa.', en: ['They are at home', "They're at home"] },
+  { id: 't9', es: '¿Cuántos años tienes?', en: ['How old are you'] },
+  { id: 't10', es: 'Me llamo Ana.', en: ['My name is Ana'] },
+  { id: 't11', es: 'Estamos listos.', en: ['We are ready', "We're ready"] },
+  { id: 't12', es: '¿Puedo entrar?', en: ['Can I come in', 'Can I go in'] },
+];
+
+/* ================================================================ */
+/* CONTENIDO — COMPLETAR (12 frases con espacio en blanco)           */
+/* ================================================================ */
+
+const CLOZE_ITEMS = [
+  { id: 'c1', text: 'She ___ to school every day.', answer: 'walks' },
+  { id: 'c2', text: 'I ___ a doctor.', answer: 'am' },
+  { id: 'c3', text: 'They ___ playing soccer right now.', answer: 'are' },
+  { id: 'c4', text: 'He ___ two brothers.', answer: 'has' },
+  { id: 'c5', text: 'This is the ___ book I have ever read. (good)', answer: 'best' },
+  { id: 'c6', text: 'We ___ to the beach yesterday. (go)', answer: 'went' },
+  { id: 'c7', text: '___ you like coffee?', answer: 'Do' },
+  { id: 'c8', text: 'I have ___ apple.', answer: 'an' },
+  { id: 'c9', text: 'There are three ___ in the park. (child)', answer: 'children' },
+  { id: 'c10', text: 'She is ___ than her sister. (tall)', answer: 'taller' },
+  { id: 'c11', text: 'My brother ___ at a bank. (work)', answer: 'works' },
+  { id: 'c12', text: 'I ___ pizza very much. (like)', answer: 'like' },
+];
+
+/* ================================================================ */
 /* UTILIDADES                                                        */
 /* ================================================================ */
 
@@ -427,7 +573,12 @@ function speak(text) {
 }
 
 function normalizeText(s) {
-  return s.toLowerCase().replace(/[^\w\s]/g, '').trim();
+  return s
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\w\s]/g, '')
+    .trim()
+    .replace(/\s+/g, ' ');
 }
 
 function shuffleArr(arr) {
@@ -455,6 +606,37 @@ function computeStreak(visitDates) {
     } else break;
   }
   return streak;
+}
+
+/* --- Repetición espaciada (sistema de cajas tipo Leitner) --- */
+const BOX_INTERVALS = [1, 2, 4, 8, 16, 30];
+
+function scheduleNext(currentBox, correct) {
+  const box = typeof currentBox === 'number' ? currentBox : -1;
+  const newBox = correct ? Math.min(box + 1, BOX_INTERVALS.length - 1) : 0;
+  const due = new Date();
+  due.setDate(due.getDate() + BOX_INTERVALS[newBox]);
+  return { box: newBox, due: due.toISOString().slice(0, 10) };
+}
+
+function parseWordId(wordId) {
+  const parts = wordId.split('-');
+  const idx = parseInt(parts[parts.length - 1], 10);
+  const catId = parts.slice(0, -1).join('-');
+  return { catId, idx };
+}
+
+function getDueWords(progress) {
+  const today = todayKey();
+  const list = [];
+  progress.knownWords.forEach((wordId) => {
+    const { catId, idx } = parseWordId(wordId);
+    const cat = VOCAB_CATEGORIES.find((c) => c.id === catId);
+    if (!cat || !cat.words[idx]) return;
+    const entry = progress.srs[wordId];
+    if (!entry || entry.due <= today) list.push({ wordId, word: cat.words[idx] });
+  });
+  return list;
 }
 
 /* --- Almacenamiento: usa window.storage (Claude) si existe, si no localStorage (sitio real) --- */
@@ -522,6 +704,21 @@ function StatPill({ done, total, color }) {
       className="text-xs rounded-full px-2.5 py-1">
       {done}/{total}
     </span>
+  );
+}
+
+function NavRow({ idx, total, setIdx }) {
+  return (
+    <div className="flex justify-between mt-5">
+      <button disabled={idx === 0} onClick={() => setIdx((i) => i - 1)}
+        style={{ color: idx === 0 ? COLORS.border : COLORS.textMuted }} className="text-sm flex items-center gap-1">
+        <IconChevronLeft size={16} />Anterior
+      </button>
+      <button disabled={idx === total - 1} onClick={() => setIdx((i) => i + 1)}
+        style={{ color: idx === total - 1 ? COLORS.border : COLORS.textMuted }} className="text-sm flex items-center gap-1">
+        Siguiente<IconChevronRight size={16} />
+      </button>
+    </div>
   );
 }
 
@@ -612,11 +809,57 @@ function ExerciseRunner({ item, colorAccent, onComplete, backLabel, onBack, head
           Verificar respuestas
         </button>
       ) : (
-        <div style={{ color: COLORS.text }} className="mt-2 text-sm">
+        <div style={{ color: COLORS.text }} className="mt-2 text-sm pop">
           Obtuviste <span style={{ fontFamily: FONT_MONO, color: colorAccent }}>{score}/{item.questions.length}</span>{' '}
           — <button onClick={retry} style={{ color: COLORS.teal }} className="underline underline-offset-2">Intentar de nuevo</button>
         </div>
       )}
+    </div>
+  );
+}
+
+function TypedAnswerExercise({ prompt, promptAudio, accepted, hint, onResult }) {
+  const [value, setValue] = useState('');
+  const [status, setStatus] = useState(null);
+
+  const check = () => {
+    const norm = normalizeText(value);
+    const ok = accepted.some((a) => normalizeText(a) === norm);
+    setStatus(ok ? 'correct' : 'wrong');
+    onResult(ok);
+  };
+
+  return (
+    <div>
+      {promptAudio && (
+        <button onClick={() => speak(promptAudio)} style={{ color: COLORS.bg, background: COLORS.indigo }}
+          className="rounded-full p-3 mb-3 hover:opacity-90 transition">
+          <IconVolume size={20} />
+        </button>
+      )}
+      {prompt && <p style={{ fontFamily: FONT_DISPLAY, color: COLORS.text }} className="text-xl mb-1">{prompt}</p>}
+      {hint && <p style={{ color: COLORS.textMuted }} className="text-xs mb-3">{hint}</p>}
+      <input
+        type="text"
+        value={value}
+        disabled={status === 'correct'}
+        onChange={(e) => { setValue(e.target.value); setStatus(null); }}
+        onKeyDown={(e) => e.key === 'Enter' && status !== 'correct' && value.trim() && check()}
+        placeholder="Escribe aquí…"
+        style={{ background: COLORS.bg, borderColor: status === 'wrong' ? COLORS.rose : status === 'correct' ? COLORS.teal : COLORS.border, color: COLORS.text }}
+        className={"w-full border rounded-xl px-4 py-2.5 text-sm mt-2" + (status === 'wrong' ? " shake" : "")}
+      />
+      <div className="flex items-center gap-3 mt-3 flex-wrap">
+        {status !== 'correct' && (
+          <button onClick={check} disabled={!value.trim()}
+            style={{ background: value.trim() ? COLORS.teal : COLORS.surfaceRaised, color: value.trim() ? COLORS.bg : COLORS.textMuted }}
+            className="text-sm rounded-full px-5 py-2 transition">
+            Verificar
+          </button>
+        )}
+        {status === 'correct' && <span style={{ color: COLORS.teal }} className="text-sm flex items-center gap-1.5 pop"><IconCheckCircle size={16} />¡Correcto!</span>}
+        {status === 'wrong' && <span style={{ color: COLORS.rose }} className="text-sm">Era: <b style={{ color: COLORS.text }}>{accepted[0]}</b></span>}
+      </div>
     </div>
   );
 }
@@ -664,15 +907,19 @@ function Header({ view, setView, overallPct, streak, onOpenCloud }) {
 /* DASHBOARD                                                         */
 /* ================================================================ */
 
-function DashboardCard({ icon: IconComp, title, description, color, done, total, onClick }) {
+function DashboardCard({ icon: IconComp, title, description, color, done, total, badge, onClick, delay }) {
   return (
-    <button onClick={onClick} style={{ background: COLORS.surface, borderColor: COLORS.border }}
-      className="text-left border rounded-2xl p-5 flex flex-col gap-3 hover:-translate-y-0.5 transition-transform duration-150">
+    <button onClick={onClick} style={{ background: COLORS.surface, borderColor: COLORS.border, animationDelay: (delay || 0) + 'ms' }}
+      className="card-enter text-left border rounded-2xl p-5 flex flex-col gap-3 hover:-translate-y-0.5 transition-transform duration-150">
       <div className="flex items-center justify-between">
         <div style={{ background: `${color}1A`, color }} className="w-10 h-10 rounded-xl flex items-center justify-center">
           <IconComp size={20} />
         </div>
-        <StatPill done={done} total={total} color={color} />
+        {badge != null ? (
+          <span style={{ fontFamily: FONT_MONO, color, background: `${color}1A` }} className="text-xs rounded-full px-2.5 py-1">{badge}</span>
+        ) : (
+          <StatPill done={done} total={total} color={color} />
+        )}
       </div>
       <div>
         <h3 style={{ fontFamily: FONT_DISPLAY, color: COLORS.text }} className="text-lg font-medium">{title}</h3>
@@ -682,26 +929,37 @@ function DashboardCard({ icon: IconComp, title, description, color, done, total,
   );
 }
 
-function Dashboard({ setView, stats, onResetRequest }) {
-  const { doneWords, totalWords, doneGrammar, totalGrammar, doneReading, totalReading, doneSpeaking, totalSpeaking, doneSentences, totalSentences } = stats;
+function Dashboard({ setView, stats, dueCount, onResetRequest }) {
+  const { doneWords, totalWords, doneGrammar, totalGrammar, doneReading, totalReading, doneSpeaking, totalSpeaking,
+    doneSentences, totalSentences, doneExercises, totalExercises, overallPct } = stats;
   return (
-    <div className="max-w-3xl mx-auto px-5 py-8">
+    <div className="max-w-3xl mx-auto px-5 py-8 view-enter">
       <p style={{ color: COLORS.textMuted }} className="text-sm mb-1">Tu espacio personal para practicar</p>
-      <h2 style={{ fontFamily: FONT_DISPLAY, color: COLORS.text }} className="text-2xl sm:text-3xl font-semibold mb-6">
+      <h2 style={{ fontFamily: FONT_DISPLAY, color: COLORS.text }} className="text-2xl sm:text-3xl font-semibold mb-4">
         ¿Qué quieres practicar hoy?
       </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <DashboardCard icon={IconBook} title="Vocabulario" description="100 palabras en 10 categorías, con audio y juego de emparejar"
-          color={COLORS.teal} done={doneWords} total={totalWords} onClick={() => setView('vocabulario')} />
-        <DashboardCard icon={IconPencil} title="Gramática" description="10 lecciones con explicación y ejercicios"
-          color={COLORS.indigo} done={doneGrammar} total={totalGrammar} onClick={() => setView('gramatica')} />
-        <DashboardCard icon={IconPage} title="Lectura" description="5 textos con preguntas de comprensión"
-          color={COLORS.amber} done={doneReading} total={totalReading} onClick={() => setView('lectura')} />
-        <DashboardCard icon={IconMic} title="Pronunciación" description="20 frases para escuchar y repetir en voz alta"
-          color={COLORS.rose} done={doneSpeaking} total={totalSpeaking} onClick={() => setView('pronunciacion')} />
-        <DashboardCard icon={IconLayers} title="Construir oraciones" description="Ordena las palabras para armar la oración correcta"
-          color={COLORS.teal} done={doneSentences} total={totalSentences} onClick={() => setView('oraciones')} />
+
+      <div style={{ background: COLORS.surfaceRaised, borderColor: COLORS.border }} className="border rounded-full h-2.5 overflow-hidden mb-6">
+        <div className="progress-fill h-full rounded-full" style={{ width: overallPct + '%', background: `linear-gradient(90deg, ${COLORS.teal}, ${COLORS.indigo})` }} />
       </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <DashboardCard delay={0} icon={IconBook} title="Vocabulario" description="140 palabras en 14 categorías, con audio y juego de emparejar"
+          color={COLORS.teal} done={doneWords} total={totalWords} onClick={() => setView('vocabulario')} />
+        <DashboardCard delay={40} icon={IconPencil} title="Gramática" description="14 lecciones con explicación y ejercicios"
+          color={COLORS.indigo} done={doneGrammar} total={totalGrammar} onClick={() => setView('gramatica')} />
+        <DashboardCard delay={80} icon={IconPage} title="Lectura" description="5 textos con preguntas de comprensión"
+          color={COLORS.amber} done={doneReading} total={totalReading} onClick={() => setView('lectura')} />
+        <DashboardCard delay={120} icon={IconMic} title="Pronunciación" description="20 frases para escuchar y repetir en voz alta"
+          color={COLORS.rose} done={doneSpeaking} total={totalSpeaking} onClick={() => setView('pronunciacion')} />
+        <DashboardCard delay={160} icon={IconLayers} title="Construir oraciones" description="Ordena las palabras para armar la oración correcta"
+          color={COLORS.teal} done={doneSentences} total={totalSentences} onClick={() => setView('oraciones')} />
+        <DashboardCard delay={200} icon={IconChecklist} title="Ejercicios" description="Dictado, traducir escribiendo y completar frases"
+          color={COLORS.indigo} done={doneExercises} total={totalExercises} onClick={() => setView('ejercicios')} />
+        <DashboardCard delay={240} icon={IconClock} title="Repaso inteligente" description="Repite justo a tiempo las palabras que se te olvidan"
+          color={COLORS.amber} badge={dueCount > 0 ? dueCount + ' hoy' : 'Al día'} onClick={() => setView('repaso')} />
+      </div>
+
       <button onClick={onResetRequest} style={{ color: COLORS.textMuted }}
         className="mt-8 text-xs flex items-center gap-1.5 hover:opacity-80 transition">
         <IconReset size={13} />Reiniciar progreso
@@ -719,17 +977,18 @@ function FlashCard({ word, known, onToggle }) {
   return (
     <div style={{ background: COLORS.surface, borderColor: known ? COLORS.teal : COLORS.border }}
       className="border rounded-2xl p-5 flex flex-col gap-3">
-      <button onClick={() => setFlipped((f) => !f)} className="text-left">
-        <p style={{ fontFamily: FONT_DISPLAY, color: COLORS.text }} className="text-2xl">{word.en}</p>
-        {flipped ? (
-          <div className="mt-2 space-y-1.5">
-            <p style={{ color: COLORS.teal }} className="text-base">{word.es}</p>
-            <p style={{ color: COLORS.textMuted }} className="text-sm italic">"{word.example}"</p>
-          </div>
-        ) : (
-          <p style={{ color: COLORS.textMuted }} className="text-xs mt-1">Toca para ver la traducción</p>
-        )}
-      </button>
+      <div className="flip-card">
+        <div className={"flip-inner" + (flipped ? " is-flipped" : "")} style={{ minHeight: 116 }}>
+          <button onClick={() => setFlipped((f) => !f)} className="flip-face text-left w-full">
+            <p style={{ fontFamily: FONT_DISPLAY, color: COLORS.text }} className="text-2xl">{word.en}</p>
+            <p style={{ color: COLORS.textMuted }} className="text-xs mt-1">Toca para ver la traducción</p>
+          </button>
+          <button onClick={() => setFlipped((f) => !f)} className="flip-face flip-back text-left w-full">
+            <p style={{ color: COLORS.teal }} className="text-lg">{word.es}</p>
+            <p style={{ color: COLORS.textMuted }} className="text-sm italic mt-1.5">"{word.example}"</p>
+          </button>
+        </div>
+      </div>
       <div className="flex items-center justify-between mt-1">
         <button onClick={() => speak(word.en)} style={{ color: COLORS.textMuted, borderColor: COLORS.border }}
           className="flex items-center gap-1.5 text-xs border rounded-full px-3 py-1.5 hover:opacity-80 transition">
@@ -787,7 +1046,7 @@ function MatchingGame({ category }) {
     <div>
       {allDone && (
         <div style={{ background: `${COLORS.teal}14`, color: COLORS.teal, borderColor: COLORS.teal }}
-          className="border rounded-xl p-3 text-sm mb-4 flex items-center justify-between">
+          className="border rounded-xl p-3 text-sm mb-4 flex items-center justify-between pop">
           <span>¡Completaste la ronda! 🎉</span>
           <button onClick={newRound} style={{ color: COLORS.teal }} className="underline underline-offset-2">Otra ronda</button>
         </div>
@@ -825,7 +1084,7 @@ function VocabView({ progress, toggleKnownWord }) {
   const active = VOCAB_CATEGORIES.find((c) => c.id === category);
 
   return (
-    <div className="max-w-3xl mx-auto px-5 py-8">
+    <div className="max-w-3xl mx-auto px-5 py-8 view-enter">
       <h2 style={{ fontFamily: FONT_DISPLAY, color: COLORS.text }} className="text-2xl font-semibold mb-4">Vocabulario</h2>
       <div className="flex flex-wrap gap-2 mb-4">
         {VOCAB_CATEGORIES.map((c) => (
@@ -854,7 +1113,7 @@ function VocabView({ progress, toggleKnownWord }) {
           })}
         </div>
       ) : (
-        <MatchingGame category={active} />
+        <MatchingGame key={active.id} category={active} />
       )}
     </div>
   );
@@ -868,14 +1127,14 @@ function GrammarView({ progress, onComplete }) {
   const [active, setActive] = useState(null);
   if (!active) {
     return (
-      <div className="max-w-3xl mx-auto px-5 py-8">
+      <div className="max-w-3xl mx-auto px-5 py-8 view-enter">
         <h2 style={{ fontFamily: FONT_DISPLAY, color: COLORS.text }} className="text-2xl font-semibold mb-6">Gramática</h2>
         <LessonList items={GRAMMAR_LESSONS} scores={progress.grammarScores} onSelect={setActive} colorAccent={COLORS.indigo} />
       </div>
     );
   }
   return (
-    <div className="max-w-3xl mx-auto px-5 py-8">
+    <div className="max-w-3xl mx-auto px-5 py-8 view-enter">
       <ExerciseRunner
         key={active.id}
         item={active}
@@ -907,14 +1166,14 @@ function ReadingView({ progress, onComplete }) {
   const [active, setActive] = useState(null);
   if (!active) {
     return (
-      <div className="max-w-3xl mx-auto px-5 py-8">
+      <div className="max-w-3xl mx-auto px-5 py-8 view-enter">
         <h2 style={{ fontFamily: FONT_DISPLAY, color: COLORS.text }} className="text-2xl font-semibold mb-6">Lectura</h2>
         <LessonList items={READING_PASSAGES} scores={progress.readingScores} onSelect={setActive} colorAccent={COLORS.amber} />
       </div>
     );
   }
   return (
-    <div className="max-w-3xl mx-auto px-5 py-8">
+    <div className="max-w-3xl mx-auto px-5 py-8 view-enter">
       <ExerciseRunner
         key={active.id}
         item={active}
@@ -983,7 +1242,7 @@ function SpeakingView({ progress, onPractice }) {
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-5 py-8">
+    <div className="max-w-3xl mx-auto px-5 py-8 view-enter">
       <h2 style={{ fontFamily: FONT_DISPLAY, color: COLORS.text }} className="text-2xl font-semibold mb-2">Pronunciación</h2>
       <p style={{ color: COLORS.textMuted }} className="text-sm mb-4">Escucha cada frase y luego repítela en voz alta.</p>
 
@@ -1110,7 +1369,7 @@ function SentenceExercise({ exercise, onComplete, doneAlready }) {
       </div>
 
       {status === 'correct' ? (
-        <p style={{ color: COLORS.teal }} className="text-sm flex items-center gap-1.5"><IconCheckCircle size={16} />¡Correcto!</p>
+        <p style={{ color: COLORS.teal }} className="text-sm flex items-center gap-1.5 pop"><IconCheckCircle size={16} />¡Correcto!</p>
       ) : (
         <div className="flex items-center gap-3">
           <button onClick={check} disabled={pool.length > 0}
@@ -1136,7 +1395,7 @@ function SentenceBuilderView({ progress, onComplete }) {
   const doneAlready = progress.sentencesCompleted.includes(exercise.id);
 
   return (
-    <div className="max-w-3xl mx-auto px-5 py-8">
+    <div className="max-w-3xl mx-auto px-5 py-8 view-enter">
       <h2 style={{ fontFamily: FONT_DISPLAY, color: COLORS.text }} className="text-2xl font-semibold mb-1">Construir oraciones</h2>
       <p style={{ fontFamily: FONT_MONO, color: COLORS.textMuted }} className="text-xs mb-6">
         Ejercicio {index + 1} de {SENTENCE_EXERCISES.length}
@@ -1146,15 +1405,152 @@ function SentenceBuilderView({ progress, onComplete }) {
         <SentenceExercise key={exercise.id} exercise={exercise} onComplete={onComplete} doneAlready={doneAlready} />
       </div>
 
-      <div className="flex justify-between mt-5">
-        <button disabled={index === 0} onClick={() => setIndex((i) => i - 1)}
-          style={{ color: index === 0 ? COLORS.border : COLORS.textMuted }} className="text-sm flex items-center gap-1">
-          <IconChevronLeft size={16} />Anterior
-        </button>
-        <button disabled={index === SENTENCE_EXERCISES.length - 1} onClick={() => setIndex((i) => i + 1)}
-          style={{ color: index === SENTENCE_EXERCISES.length - 1 ? COLORS.border : COLORS.textMuted }} className="text-sm flex items-center gap-1">
-          Siguiente<IconChevronRight size={16} />
-        </button>
+      <NavRow idx={index} total={SENTENCE_EXERCISES.length} setIdx={setIndex} />
+    </div>
+  );
+}
+
+/* ================================================================ */
+/* EJERCICIOS: dictado / traducir / completar                        */
+/* ================================================================ */
+
+function ExercisesView({ progress, onDictation, onTranslation, onCloze }) {
+  const [mode, setMode] = useState('dictado');
+  const [dictIdx, setDictIdx] = useState(0);
+  const [transIdx, setTransIdx] = useState(0);
+  const [clozeIdx, setClozeIdx] = useState(0);
+
+  return (
+    <div className="max-w-3xl mx-auto px-5 py-8 view-enter">
+      <h2 style={{ fontFamily: FONT_DISPLAY, color: COLORS.text }} className="text-2xl font-semibold mb-4">Ejercicios</h2>
+      <div className="flex flex-wrap gap-2 mb-6">
+        {[['dictado', 'Dictado'], ['traducir', 'Traducir'], ['completar', 'Completar']].map(([id, label]) => (
+          <button key={id} onClick={() => setMode(id)}
+            style={{ background: mode === id ? COLORS.indigo : 'transparent', color: mode === id ? COLORS.bg : COLORS.textMuted, borderColor: mode === id ? COLORS.indigo : COLORS.border }}
+            className="text-sm border rounded-full px-3.5 py-1.5 transition">{label}</button>
+        ))}
+      </div>
+
+      {mode === 'dictado' && (
+        <div>
+          <p style={{ color: COLORS.textMuted }} className="text-sm mb-1">Escucha y escribe exactamente lo que oyes</p>
+          <p style={{ fontFamily: FONT_MONO, color: COLORS.textMuted }} className="text-xs mb-4">{dictIdx + 1} de {SPEAKING_PHRASES.length}</p>
+          <div style={{ background: COLORS.surface, borderColor: COLORS.border }} className="border rounded-2xl p-5">
+            <TypedAnswerExercise
+              key={'dict' + dictIdx}
+              promptAudio={SPEAKING_PHRASES[dictIdx].en}
+              accepted={[SPEAKING_PHRASES[dictIdx].en]}
+              onResult={(ok) => ok && onDictation(dictIdx)}
+            />
+          </div>
+          <NavRow idx={dictIdx} total={SPEAKING_PHRASES.length} setIdx={setDictIdx} />
+        </div>
+      )}
+      {mode === 'traducir' && (
+        <div>
+          <p style={{ color: COLORS.textMuted }} className="text-sm mb-1">Escribe la traducción al inglés</p>
+          <p style={{ fontFamily: FONT_MONO, color: COLORS.textMuted }} className="text-xs mb-4">{transIdx + 1} de {TRANSLATION_ITEMS.length}</p>
+          <div style={{ background: COLORS.surface, borderColor: COLORS.border }} className="border rounded-2xl p-5">
+            <TypedAnswerExercise
+              key={'trans' + transIdx}
+              prompt={TRANSLATION_ITEMS[transIdx].es}
+              accepted={TRANSLATION_ITEMS[transIdx].en}
+              onResult={(ok) => ok && onTranslation(TRANSLATION_ITEMS[transIdx].id)}
+            />
+          </div>
+          <NavRow idx={transIdx} total={TRANSLATION_ITEMS.length} setIdx={setTransIdx} />
+        </div>
+      )}
+      {mode === 'completar' && (
+        <div>
+          <p style={{ color: COLORS.textMuted }} className="text-sm mb-1">Completa la palabra que falta</p>
+          <p style={{ fontFamily: FONT_MONO, color: COLORS.textMuted }} className="text-xs mb-4">{clozeIdx + 1} de {CLOZE_ITEMS.length}</p>
+          <div style={{ background: COLORS.surface, borderColor: COLORS.border }} className="border rounded-2xl p-5">
+            <TypedAnswerExercise
+              key={'cloze' + clozeIdx}
+              prompt={CLOZE_ITEMS[clozeIdx].text}
+              accepted={[CLOZE_ITEMS[clozeIdx].answer]}
+              onResult={(ok) => ok && onCloze(CLOZE_ITEMS[clozeIdx].id)}
+            />
+          </div>
+          <NavRow idx={clozeIdx} total={CLOZE_ITEMS.length} setIdx={setClozeIdx} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ================================================================ */
+/* REPASO INTELIGENTE (repetición espaciada)                         */
+/* ================================================================ */
+
+function ReviewView({ progress, onReviewResult }) {
+  // Se captura una sola vez al entrar a la vista: si se recalculara en cada
+  // respuesta, la palabra recién repasada saldría de la lista al instante
+  // (porque ya tendría una nueva fecha de vencimiento) y la sesión saltaría
+  // de golpe al estado "completado" sin mostrar el botón "Siguiente".
+  const [dueList] = useState(() => getDueWords(progress));
+  const [idx, setIdx] = useState(0);
+  const [value, setValue] = useState('');
+  const [status, setStatus] = useState(null);
+
+  if (dueList.length === 0) {
+    return (
+      <div className="max-w-3xl mx-auto px-5 py-8 view-enter">
+        <h2 style={{ fontFamily: FONT_DISPLAY, color: COLORS.text }} className="text-2xl font-semibold mb-4">Repaso inteligente</h2>
+        <div style={{ background: COLORS.surface, borderColor: COLORS.border }} className="border rounded-2xl p-8 text-center">
+          <p style={{ color: COLORS.teal }} className="text-lg mb-1">¡Estás al día! 🎉</p>
+          <p style={{ color: COLORS.textMuted }} className="text-sm">No tienes palabras pendientes de repaso hoy. Marca más palabras como "Ya lo sé" en Vocabulario para agregarlas aquí.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (idx >= dueList.length) {
+    return (
+      <div className="max-w-3xl mx-auto px-5 py-8 view-enter">
+        <h2 style={{ fontFamily: FONT_DISPLAY, color: COLORS.text }} className="text-2xl font-semibold mb-4">Repaso inteligente</h2>
+        <div style={{ background: COLORS.surface, borderColor: COLORS.border }} className="border rounded-2xl p-8 text-center pop">
+          <p style={{ color: COLORS.teal }} className="text-lg">¡Repaso completado! 🎉</p>
+          <p style={{ color: COLORS.textMuted }} className="text-sm mt-1">Vuelve mañana para tu próximo repaso.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const current = dueList[idx];
+  const check = () => {
+    const ok = normalizeText(value) === normalizeText(current.word.es);
+    setStatus(ok ? 'correct' : 'wrong');
+    onReviewResult(current.wordId, ok);
+  };
+  const next = () => { setIdx((i) => i + 1); setValue(''); setStatus(null); };
+
+  return (
+    <div className="max-w-3xl mx-auto px-5 py-8 view-enter">
+      <h2 style={{ fontFamily: FONT_DISPLAY, color: COLORS.text }} className="text-2xl font-semibold mb-1">Repaso inteligente</h2>
+      <p style={{ fontFamily: FONT_MONO, color: COLORS.textMuted }} className="text-xs mb-6">{idx + 1} de {dueList.length} pendientes hoy</p>
+
+      <div style={{ background: COLORS.surface, borderColor: COLORS.border }} className="border rounded-2xl p-6">
+        <p style={{ color: COLORS.textMuted }} className="text-sm mb-2">¿Cómo se dice en español?</p>
+        <p style={{ fontFamily: FONT_DISPLAY, color: COLORS.text }} className="text-2xl mb-4">{current.word.en}</p>
+        <input type="text" value={value} disabled={status === 'correct'}
+          onChange={(e) => { setValue(e.target.value); setStatus(null); }}
+          onKeyDown={(e) => e.key === 'Enter' && status !== 'correct' && value.trim() && check()}
+          placeholder="Escribe la traducción…"
+          style={{ background: COLORS.bg, borderColor: status === 'wrong' ? COLORS.rose : status === 'correct' ? COLORS.teal : COLORS.border, color: COLORS.text }}
+          className={"w-full border rounded-xl px-4 py-2.5 text-sm" + (status === 'wrong' ? " shake" : "")} />
+
+        <div className="flex items-center gap-3 mt-4 flex-wrap">
+          {status !== 'correct' ? (
+            <button onClick={check} disabled={!value.trim()}
+              style={{ background: value.trim() ? COLORS.teal : COLORS.surfaceRaised, color: value.trim() ? COLORS.bg : COLORS.textMuted }}
+              className="text-sm rounded-full px-5 py-2 transition">Verificar</button>
+          ) : (
+            <button onClick={next} style={{ background: COLORS.teal, color: COLORS.bg }} className="text-sm rounded-full px-5 py-2 pop">Siguiente →</button>
+          )}
+          {status === 'wrong' && <span style={{ color: COLORS.rose }} className="text-sm">Era: <b style={{ color: COLORS.text }}>{current.word.es}</b> — <button onClick={next} style={{ color: COLORS.textMuted }} className="underline underline-offset-2">Siguiente</button></span>}
+        </div>
       </div>
     </div>
   );
@@ -1200,7 +1596,7 @@ function CloudPanel({ onClose, token, gistId, saveToken, forgetToken, saveGistId
 
   return (
     <div style={{ background: 'rgba(0,0,0,0.6)' }} className="fixed inset-0 flex items-start sm:items-center justify-center p-4 z-30 overflow-y-auto">
-      <div style={{ background: COLORS.surface, borderColor: COLORS.border }} className="border rounded-2xl p-5 max-w-md w-full my-8">
+      <div style={{ background: COLORS.surface, borderColor: COLORS.border }} className="border rounded-2xl p-5 max-w-md w-full my-8 pop">
         <div className="flex items-center justify-between mb-4">
           <h3 style={{ fontFamily: FONT_DISPLAY, color: COLORS.text }} className="text-lg flex items-center gap-2">
             <IconCloud size={18} style={{ color: COLORS.teal }} />Copia en la nube
@@ -1210,14 +1606,14 @@ function CloudPanel({ onClose, token, gistId, saveToken, forgetToken, saveGistId
 
         <p style={{ color: COLORS.textMuted }} className="text-xs leading-relaxed mb-4">
           Guarda tu progreso en un Gist privado y secreto de tu cuenta de GitHub, para no perderlo y poder
-          verlo desde otro dispositivo. Necesitas un token personal de GitHub con permiso <b style={{color: COLORS.text}}>gist</b> solamente.
+          verlo desde otro dispositivo. Necesitas un token personal de GitHub con permiso <b style={{ color: COLORS.text }}>gist</b> solamente.
         </p>
 
         <details className="mb-4">
           <summary style={{ color: COLORS.indigo }} className="text-xs cursor-pointer">¿Cómo consigo un token?</summary>
           <ol style={{ color: COLORS.textMuted }} className="text-xs mt-2 space-y-1 pl-4 list-decimal">
             <li>Ve a github.com/settings/tokens y elige "Generate new token (classic)"</li>
-            <li>Ponle un nombre, y en "Select scopes" marca solo <b style={{color: COLORS.text}}>gist</b></li>
+            <li>Ponle un nombre, y en "Select scopes" marca solo <b style={{ color: COLORS.text }}>gist</b></li>
             <li>Genera el token y cópialo (solo se muestra una vez)</li>
             <li>Pégalo abajo — se queda solo en este navegador, nunca se sube al repositorio</li>
           </ol>
@@ -1252,8 +1648,12 @@ function CloudPanel({ onClose, token, gistId, saveToken, forgetToken, saveGistId
 /* APP PRINCIPAL                                                     */
 /* ================================================================ */
 
-const EMPTY_PROGRESS = { knownWords: [], grammarScores: {}, readingScores: {}, practicedPhrases: [], sentencesCompleted: [], visitDates: [] };
-const KEY_PROGRESS = 'bridge-english-progress-v2';
+const EMPTY_PROGRESS = {
+  knownWords: [], grammarScores: {}, readingScores: {}, practicedPhrases: [],
+  sentencesCompleted: [], visitDates: [], dictationDone: [], translationDone: [],
+  clozeDone: [], srs: {},
+};
+const KEY_PROGRESS = 'bridge-english-progress-v3';
 const KEY_TOKEN = 'bridge-english-gh-token';
 const KEY_GISTID = 'bridge-english-gh-gistid';
 
@@ -1297,6 +1697,14 @@ function App() {
   const saveReadingScore = (passageId, score) => persist({ ...progress, readingScores: { ...progress.readingScores, [passageId]: score } });
   const markPracticed = (idx) => { if (!progress.practicedPhrases.includes(idx)) persist({ ...progress, practicedPhrases: [...progress.practicedPhrases, idx] }); };
   const markSentence = (id) => { if (!progress.sentencesCompleted.includes(id)) persist({ ...progress, sentencesCompleted: [...progress.sentencesCompleted, id] }); };
+  const markDictation = (idx) => { if (!progress.dictationDone.includes(idx)) persist({ ...progress, dictationDone: [...progress.dictationDone, idx] }); };
+  const markTranslation = (id) => { if (!progress.translationDone.includes(id)) persist({ ...progress, translationDone: [...progress.translationDone, id] }); };
+  const markCloze = (id) => { if (!progress.clozeDone.includes(id)) persist({ ...progress, clozeDone: [...progress.clozeDone, id] }); };
+  const onReviewResult = (wordId, correct) => {
+    const currentBox = progress.srs[wordId] ? progress.srs[wordId].box : -1;
+    const nextEntry = scheduleNext(currentBox, correct);
+    persist({ ...progress, srs: { ...progress.srs, [wordId]: nextEntry } });
+  };
   const doReset = () => { persist(EMPTY_PROGRESS); setConfirmReset(false); };
 
   const saveToken = (t) => { setToken(t); storageSet(KEY_TOKEN, t); };
@@ -1309,25 +1717,29 @@ function App() {
   const totalReading = READING_PASSAGES.length;
   const totalSpeaking = SPEAKING_PHRASES.length;
   const totalSentences = SENTENCE_EXERCISES.length;
+  const totalExercises = SPEAKING_PHRASES.length + TRANSLATION_ITEMS.length + CLOZE_ITEMS.length;
 
   const doneWords = progress.knownWords.length;
   const doneGrammar = Object.keys(progress.grammarScores).length;
   const doneReading = Object.keys(progress.readingScores).length;
   const doneSpeaking = progress.practicedPhrases.length;
   const doneSentences = progress.sentencesCompleted.length;
+  const doneExercises = progress.dictationDone.length + progress.translationDone.length + progress.clozeDone.length;
 
-  const totalAll = totalWords + totalGrammar + totalReading + totalSpeaking + totalSentences;
-  const doneAll = doneWords + doneGrammar + doneReading + doneSpeaking + doneSentences;
+  const totalAll = totalWords + totalGrammar + totalReading + totalSpeaking + totalSentences + totalExercises;
+  const doneAll = doneWords + doneGrammar + doneReading + doneSpeaking + doneSentences + doneExercises;
   const overallPct = totalAll > 0 ? Math.round((doneAll / totalAll) * 100) : 0;
   const streak = computeStreak(progress.visitDates);
+  const dueCount = getDueWords(progress).length;
 
   return (
     <div style={{ background: COLORS.bg, minHeight: '100vh' }}>
       <Header view={view} setView={setView} overallPct={overallPct} streak={streak} onOpenCloud={() => setCloudOpen(true)} />
 
       {view === 'dashboard' && (
-        <Dashboard setView={setView}
-          stats={{ doneWords, totalWords, doneGrammar, totalGrammar, doneReading, totalReading, doneSpeaking, totalSpeaking, doneSentences, totalSentences }}
+        <Dashboard setView={setView} dueCount={dueCount}
+          stats={{ doneWords, totalWords, doneGrammar, totalGrammar, doneReading, totalReading, doneSpeaking, totalSpeaking,
+            doneSentences, totalSentences, doneExercises, totalExercises, overallPct }}
           onResetRequest={() => setConfirmReset(true)} />
       )}
       {view === 'vocabulario' && <VocabView progress={progress} toggleKnownWord={toggleKnownWord} />}
@@ -1335,6 +1747,8 @@ function App() {
       {view === 'lectura' && <ReadingView progress={progress} onComplete={saveReadingScore} />}
       {view === 'pronunciacion' && <SpeakingView progress={progress} onPractice={markPracticed} />}
       {view === 'oraciones' && <SentenceBuilderView progress={progress} onComplete={markSentence} />}
+      {view === 'ejercicios' && <ExercisesView progress={progress} onDictation={markDictation} onTranslation={markTranslation} onCloze={markCloze} />}
+      {view === 'repaso' && <ReviewView progress={progress} onReviewResult={onReviewResult} />}
 
       {cloudOpen && (
         <CloudPanel onClose={() => setCloudOpen(false)} token={token} gistId={gistId}
@@ -1344,7 +1758,7 @@ function App() {
 
       {confirmReset && (
         <div style={{ background: 'rgba(0,0,0,0.6)' }} className="fixed inset-0 flex items-center justify-center p-5 z-30">
-          <div style={{ background: COLORS.surface, borderColor: COLORS.border }} className="border rounded-2xl p-5 max-w-xs w-full">
+          <div style={{ background: COLORS.surface, borderColor: COLORS.border }} className="border rounded-2xl p-5 max-w-xs w-full pop">
             <p style={{ color: COLORS.text }} className="text-sm mb-4">¿Seguro que quieres reiniciar todo tu progreso local? Esta acción no se puede deshacer.</p>
             <div className="flex gap-2 justify-end">
               <button onClick={() => setConfirmReset(false)} style={{ color: COLORS.textMuted, borderColor: COLORS.border }} className="text-sm border rounded-full px-4 py-1.5">Cancelar</button>
