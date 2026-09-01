@@ -6,6 +6,10 @@
 <title>Bridge English · Aprende inglés</title>
 <meta name="description" content="Practica vocabulario, gramática, lectura, pronunciación y repaso inteligente de inglés." />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%89%3C/text%3E%3C/svg%3E" />
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Bridge%20English%22%2C%22short_name%22%3A%22Bridge%20English%22%2C%22description%22%3A%22Practica%20ingles%3A%20vocabulario%2C%20gramatica%2C%20lectura%20y%20pronunciacion.%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230D1117%22%2C%22theme_color%22%3A%22%230D1117%22%7D" />
+<meta name="theme-color" content="#0D1117" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="Bridge English" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -55,10 +59,17 @@ const {
 } = React;
 
 /* ================================================================ */
-/* TOKENS                                                            */
+/* TOKENS — tema claro / oscuro                                      */
 /* ================================================================ */
+/* COLORS es un objeto mutable a nivel de módulo: en vez de reasignarlo
+   (lo que rompería a los muchos componentes que ya leen COLORS.xxx por
+   clausura), sus propiedades se sobrescriben in-place con applyTheme().
+   Como el acceso a propiedades de un objeto siempre es "en vivo" en JS,
+   cualquier componente que se vuelva a renderizar después de esa mutación
+   automáticamente pinta con los colores nuevos, sin necesidad de pasar
+   COLORS por props o contexto en cada componente. */
 
-const COLORS = {
+const DARK_PALETTE = {
   bg: '#0D1117',
   surface: '#161D26',
   surfaceRaised: '#1D2733',
@@ -69,6 +80,35 @@ const COLORS = {
   amber: '#F5B942',
   indigo: '#8B93F8',
   rose: '#FB7185'
+};
+const LIGHT_PALETTE = {
+  bg: '#F7F8FA',
+  surface: '#FFFFFF',
+  surfaceRaised: '#EEF1F5',
+  border: '#DCE1E7',
+  text: '#1A2129',
+  textMuted: '#5B6572',
+  teal: '#0C9488',
+  amber: '#B45309',
+  indigo: '#4F46E5',
+  rose: '#E11D48'
+};
+const COLORS = {
+  ...DARK_PALETTE
+};
+function applyTheme(name) {
+  Object.assign(COLORS, name === 'light' ? LIGHT_PALETTE : DARK_PALETTE);
+}
+
+/* --- Velocidad de audio: mismo patrón mutable, para no pasar la
+   configuración por props a cada botón de audio de la app --- */
+const AUDIO_SETTINGS = {
+  rate: 0.88
+};
+const AUDIO_RATE_BY_SPEED = {
+  lento: 0.65,
+  normal: 0.88,
+  rapido: 1.15
 };
 const FONT_DISPLAY = "'Fraunces', serif";
 const FONT_MONO = "'IBM Plex Mono', monospace";
@@ -293,6 +333,31 @@ const IconClock = p => /*#__PURE__*/React.createElement(Icon, p, /*#__PURE__*/Re
   r: "9"
 }), /*#__PURE__*/React.createElement("path", {
   d: "M12 7v5l3 3"
+}));
+const IconTrophy = p => /*#__PURE__*/React.createElement(Icon, p, /*#__PURE__*/React.createElement("path", {
+  d: "M8 4h8v4a4 4 0 0 1-8 0V4Z"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "M6 5H4a3 3 0 0 0 3 3"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "M18 5h2a3 3 0 0 1-3 3"
+}), /*#__PURE__*/React.createElement("line", {
+  x1: "10",
+  y1: "15",
+  x2: "10",
+  y2: "18"
+}), /*#__PURE__*/React.createElement("line", {
+  x1: "14",
+  y1: "15",
+  x2: "14",
+  y2: "18"
+}), /*#__PURE__*/React.createElement("line", {
+  x1: "8",
+  y1: "20",
+  x2: "16",
+  y2: "20"
+}));
+const IconBolt = p => /*#__PURE__*/React.createElement(Icon, p, /*#__PURE__*/React.createElement("path", {
+  d: "M13 2 4 14h6l-1 8 9-12h-6l1-8Z"
 }));
 
 /* ================================================================ */
@@ -1715,6 +1780,60 @@ const READING_PASSAGES = [{
     options: ['Tired', 'Sad', 'Happy and relaxed'],
     answer: 2
   }]
+}, {
+  id: 'job-interview',
+  title: 'A Job Interview',
+  level: 'Avanzado',
+  text: 'Good morning. Please, sit down, said the interviewer. Thank you for having me, replied Sofia. Can you tell me about your experience? the interviewer asked. I have worked as a graphic designer for five years, said Sofia. I have also managed small teams. That is impressive. Why do you want to work here? I admire your company\u2019s projects, and I believe I can contribute new ideas. The interviewer smiled and said, We will contact you next week with our decision.',
+  questions: [{
+    text: "What is Sofia's profession?",
+    options: ['Teacher', 'Graphic designer', 'Doctor'],
+    answer: 1
+  }, {
+    text: 'How many years of experience does she have?',
+    options: ['Three', 'Five', 'Ten'],
+    answer: 1
+  }, {
+    text: 'When will the interviewer contact her?',
+    options: ['Tomorrow', 'Next week', 'Next month'],
+    answer: 1
+  }]
+}, {
+  id: 'climate-news',
+  title: 'Climate News',
+  level: 'Avanzado',
+  text: 'Scientists announced today that global temperatures have risen significantly over the past decade. According to a new report, many cities are experiencing hotter summers and less rainfall. Experts recommend that governments invest in renewable energy and protect natural forests. Local communities are also starting projects to plant more trees and reduce waste. Although the situation is serious, many people believe that small changes can make a big difference.',
+  questions: [{
+    text: 'What has risen over the past decade?',
+    options: ['Rainfall', 'Global temperatures', 'Forest size'],
+    answer: 1
+  }, {
+    text: 'What do experts recommend?',
+    options: ['More renewable energy', 'More cities', 'Less rain'],
+    answer: 0
+  }, {
+    text: 'What are local communities doing?',
+    options: ['Nothing', 'Planting trees and reducing waste', 'Moving away'],
+    answer: 1
+  }]
+}, {
+  id: 'lost-wallet',
+  title: 'The Lost Wallet',
+  level: 'Intermedio',
+  text: 'Last week, Tom found a wallet on the street near his office. Inside, there was some money, a few cards, and a photo of a family. Tom decided to look for the owner instead of keeping the money. He checked the cards and found a name and phone number. He called the number, and a woman answered, sounding worried. She was extremely happy when Tom explained what he had found. They met the next day, and she thanked him with a warm hug and a small gift.',
+  questions: [{
+    text: 'Where did Tom find the wallet?',
+    options: ['At home', 'On the street', 'In a store'],
+    answer: 1
+  }, {
+    text: 'What did Tom decide to do?',
+    options: ['Keep the money', 'Look for the owner', 'Ignore it'],
+    answer: 1
+  }, {
+    text: 'How did the woman feel when Tom called?',
+    options: ['Angry', 'Happy', 'Confused'],
+    answer: 1
+  }]
 }];
 
 /* ================================================================ */
@@ -1898,6 +2017,38 @@ const TRANSLATION_ITEMS = [{
   id: 't12',
   es: '¿Puedo entrar?',
   en: ['Can I come in', 'Can I go in']
+}, {
+  id: 't13',
+  es: 'Estoy cansado.',
+  en: ['I am tired', "I'm tired"]
+}, {
+  id: 't14',
+  es: 'Ella trabaja aquí.',
+  en: ['She works here']
+}, {
+  id: 't15',
+  es: '¿Cuánto cuesta esto?',
+  en: ['How much does this cost', 'How much is this']
+}, {
+  id: 't16',
+  es: 'Nosotros vamos al parque.',
+  en: ['We go to the park', 'We are going to the park']
+}, {
+  id: 't17',
+  es: 'Él no habla español.',
+  en: ["He doesn't speak Spanish", 'He does not speak Spanish']
+}, {
+  id: 't18',
+  es: '¿Qué estás haciendo?',
+  en: ['What are you doing']
+}, {
+  id: 't19',
+  es: 'Ellos tienen dos hijos.',
+  en: ['They have two children']
+}, {
+  id: 't20',
+  es: 'Voy a llamarte mañana.',
+  en: ['I am going to call you tomorrow', "I'm going to call you tomorrow"]
 }];
 
 /* ================================================================ */
@@ -1952,6 +2103,431 @@ const CLOZE_ITEMS = [{
   id: 'c12',
   text: 'I ___ pizza very much. (like)',
   answer: 'like'
+}, {
+  id: 'c13',
+  text: 'I ___ very happy today. (be)',
+  answer: 'am'
+}, {
+  id: 'c14',
+  text: 'They ___ speak French. (can)',
+  answer: 'can'
+}, {
+  id: 'c15',
+  text: 'We ___ travel next year. (will)',
+  answer: 'will'
+}, {
+  id: 'c16',
+  text: 'This is ___ book. (mi)',
+  answer: 'my'
+}, {
+  id: 'c17',
+  text: 'He ___ eats meat. (nunca)',
+  answer: 'never'
+}, {
+  id: 'c18',
+  text: 'If it rains, I ___ stay home. (will)',
+  answer: 'will'
+}, {
+  id: 'c19',
+  text: 'I have ___ been to Japan. (nunca)',
+  answer: 'never'
+}, {
+  id: 'c20',
+  text: 'She is taller ___ her brother. (que)',
+  answer: 'than'
+}];
+
+/* ================================================================ */
+/* CONTENIDO — VERBOS IRREGULARES (20)                                */
+/* ================================================================ */
+
+const IRREGULAR_VERBS = [{
+  base: 'be',
+  past: 'was/were',
+  participle: 'been',
+  es: 'ser / estar'
+}, {
+  base: 'go',
+  past: 'went',
+  participle: 'gone',
+  es: 'ir'
+}, {
+  base: 'have',
+  past: 'had',
+  participle: 'had',
+  es: 'tener'
+}, {
+  base: 'do',
+  past: 'did',
+  participle: 'done',
+  es: 'hacer'
+}, {
+  base: 'see',
+  past: 'saw',
+  participle: 'seen',
+  es: 'ver'
+}, {
+  base: 'eat',
+  past: 'ate',
+  participle: 'eaten',
+  es: 'comer'
+}, {
+  base: 'drink',
+  past: 'drank',
+  participle: 'drunk',
+  es: 'beber'
+}, {
+  base: 'take',
+  past: 'took',
+  participle: 'taken',
+  es: 'tomar'
+}, {
+  base: 'make',
+  past: 'made',
+  participle: 'made',
+  es: 'hacer / fabricar'
+}, {
+  base: 'get',
+  past: 'got',
+  participle: 'gotten',
+  es: 'obtener'
+}, {
+  base: 'come',
+  past: 'came',
+  participle: 'come',
+  es: 'venir'
+}, {
+  base: 'write',
+  past: 'wrote',
+  participle: 'written',
+  es: 'escribir'
+}, {
+  base: 'read',
+  past: 'read',
+  participle: 'read',
+  es: 'leer'
+}, {
+  base: 'speak',
+  past: 'spoke',
+  participle: 'spoken',
+  es: 'hablar'
+}, {
+  base: 'buy',
+  past: 'bought',
+  participle: 'bought',
+  es: 'comprar'
+}, {
+  base: 'think',
+  past: 'thought',
+  participle: 'thought',
+  es: 'pensar'
+}, {
+  base: 'know',
+  past: 'knew',
+  participle: 'known',
+  es: 'saber / conocer'
+}, {
+  base: 'give',
+  past: 'gave',
+  participle: 'given',
+  es: 'dar'
+}, {
+  base: 'find',
+  past: 'found',
+  participle: 'found',
+  es: 'encontrar'
+}, {
+  base: 'run',
+  past: 'ran',
+  participle: 'run',
+  es: 'correr'
+}];
+
+/* ================================================================ */
+/* CONTENIDO — FRASES IDIOMÁTICAS (15)                                */
+/* ================================================================ */
+
+const IDIOMS = [{
+  en: "It's raining cats and dogs",
+  es: 'Está lloviendo a cántaros',
+  meaning: 'Llueve muy fuerte'
+}, {
+  en: 'Break a leg',
+  es: '¡Mucha suerte!',
+  meaning: 'Se usa para desear buena suerte, sobre todo antes de una actuación'
+}, {
+  en: 'Piece of cake',
+  es: 'Pan comido',
+  meaning: 'Algo muy fácil de hacer'
+}, {
+  en: 'Hit the books',
+  es: 'Ponerse a estudiar',
+  meaning: 'Estudiar intensamente'
+}, {
+  en: 'Under the weather',
+  es: 'Sentirse mal',
+  meaning: 'Sentirse enfermo o de mal ánimo'
+}, {
+  en: 'Cost an arm and a leg',
+  es: 'Costar un ojo de la cara',
+  meaning: 'Ser muy caro'
+}, {
+  en: 'Once in a blue moon',
+  es: 'De vez en cuando',
+  meaning: 'Algo que sucede muy raramente'
+}, {
+  en: 'Let the cat out of the bag',
+  es: 'Revelar un secreto',
+  meaning: 'Contar algo que era secreto, por accidente'
+}, {
+  en: 'Speak of the devil',
+  es: 'Hablando del rey de Roma',
+  meaning: 'Se dice cuando alguien aparece justo cuando se hablaba de él o ella'
+}, {
+  en: 'Bite the bullet',
+  es: 'Afrontar la situación',
+  meaning: 'Aceptar algo difícil con valentía'
+}, {
+  en: 'Hit the sack',
+  es: 'Irse a dormir',
+  meaning: 'Ir a la cama'
+}, {
+  en: 'Time flies',
+  es: 'El tiempo vuela',
+  meaning: 'El tiempo pasa muy rápido'
+}, {
+  en: 'The ball is in your court',
+  es: 'La decisión es tuya',
+  meaning: 'Es tu turno de actuar o decidir'
+}, {
+  en: 'Better late than never',
+  es: 'Más vale tarde que nunca',
+  meaning: 'Es mejor hacer algo tarde que no hacerlo'
+}, {
+  en: 'Practice makes perfect',
+  es: 'La práctica hace al maestro',
+  meaning: 'Cuanto más practiques, mejor te saldrá'
+}];
+
+/* ================================================================ */
+/* CONTENIDO — ANAGRAMAS (15 palabras)                                */
+/* ================================================================ */
+
+const ANAGRAM_ITEMS = [{
+  word: 'GARDEN',
+  es: 'Jardín'
+}, {
+  word: 'KITCHEN',
+  es: 'Cocina'
+}, {
+  word: 'WINDOW',
+  es: 'Ventana'
+}, {
+  word: 'DOCTOR',
+  es: 'Doctor(a)'
+}, {
+  word: 'MEDICINE',
+  es: 'Medicina'
+}, {
+  word: 'HOSPITAL',
+  es: 'Hospital'
+}, {
+  word: 'FLOWER',
+  es: 'Flor'
+}, {
+  word: 'MOUNTAIN',
+  es: 'Montaña'
+}, {
+  word: 'FOREST',
+  es: 'Bosque'
+}, {
+  word: 'BEACH',
+  es: 'Playa'
+}, {
+  word: 'COMPUTER',
+  es: 'Computadora'
+}, {
+  word: 'BATTERY',
+  es: 'Batería'
+}, {
+  word: 'BICYCLE',
+  es: 'Bicicleta'
+}, {
+  word: 'TRAFFIC',
+  es: 'Tráfico'
+}, {
+  word: 'BREAKFAST',
+  es: 'Desayuno'
+}];
+
+/* ================================================================ */
+/* CONTENIDO — QUIZ DE EMOJIS (41 palabras concretas)                 */
+/* ================================================================ */
+
+const EMOJI_ITEMS = [{
+  emoji: '🔴',
+  en: 'Red',
+  es: 'Rojo'
+}, {
+  emoji: '🔵',
+  en: 'Blue',
+  es: 'Azul'
+}, {
+  emoji: '🟢',
+  en: 'Green',
+  es: 'Verde'
+}, {
+  emoji: '🟡',
+  en: 'Yellow',
+  es: 'Amarillo'
+}, {
+  emoji: '⚫',
+  en: 'Black',
+  es: 'Negro'
+}, {
+  emoji: '⚪',
+  en: 'White',
+  es: 'Blanco'
+}, {
+  emoji: '🟠',
+  en: 'Orange',
+  es: 'Naranja'
+}, {
+  emoji: '🟣',
+  en: 'Purple',
+  es: 'Morado'
+}, {
+  emoji: '☀️',
+  en: 'Sun',
+  es: 'Sol'
+}, {
+  emoji: '🌧️',
+  en: 'Rain',
+  es: 'Lluvia'
+}, {
+  emoji: '☁️',
+  en: 'Cloud',
+  es: 'Nube'
+}, {
+  emoji: '❄️',
+  en: 'Snow',
+  es: 'Nieve'
+}, {
+  emoji: '🍎',
+  en: 'Apple',
+  es: 'Manzana'
+}, {
+  emoji: '🍞',
+  en: 'Bread',
+  es: 'Pan'
+}, {
+  emoji: '☕',
+  en: 'Coffee',
+  es: 'Café'
+}, {
+  emoji: '🍚',
+  en: 'Rice',
+  es: 'Arroz'
+}, {
+  emoji: '🍗',
+  en: 'Chicken',
+  es: 'Pollo'
+}, {
+  emoji: '🥛',
+  en: 'Milk',
+  es: 'Leche'
+}, {
+  emoji: '🚗',
+  en: 'Car',
+  es: 'Auto'
+}, {
+  emoji: '🚌',
+  en: 'Bus',
+  es: 'Autobús'
+}, {
+  emoji: '🚲',
+  en: 'Bicycle',
+  es: 'Bicicleta'
+}, {
+  emoji: '🏍️',
+  en: 'Motorcycle',
+  es: 'Motocicleta'
+}, {
+  emoji: '🚕',
+  en: 'Taxi',
+  es: 'Taxi'
+}, {
+  emoji: '🌳',
+  en: 'Tree',
+  es: 'Árbol'
+}, {
+  emoji: '🌸',
+  en: 'Flower',
+  es: 'Flor'
+}, {
+  emoji: '⛰️',
+  en: 'Mountain',
+  es: 'Montaña'
+}, {
+  emoji: '🌊',
+  en: 'Ocean',
+  es: 'Océano'
+}, {
+  emoji: '🌲',
+  en: 'Forest',
+  es: 'Bosque'
+}, {
+  emoji: '⭐',
+  en: 'Star',
+  es: 'Estrella'
+}, {
+  emoji: '🌙',
+  en: 'Moon',
+  es: 'Luna'
+}, {
+  emoji: '🏖️',
+  en: 'Beach',
+  es: 'Playa'
+}, {
+  emoji: '😊',
+  en: 'Happy',
+  es: 'Feliz'
+}, {
+  emoji: '😢',
+  en: 'Sad',
+  es: 'Triste'
+}, {
+  emoji: '😠',
+  en: 'Angry',
+  es: 'Enojado'
+}, {
+  emoji: '😴',
+  en: 'Tired',
+  es: 'Cansado'
+}, {
+  emoji: '🤩',
+  en: 'Excited',
+  es: 'Emocionado'
+}, {
+  emoji: '😨',
+  en: 'Scared',
+  es: 'Asustado'
+}, {
+  emoji: '😮',
+  en: 'Surprised',
+  es: 'Sorprendido'
+}, {
+  emoji: '👕',
+  en: 'Shirt',
+  es: 'Camisa'
+}, {
+  emoji: '👟',
+  en: 'Shoes',
+  es: 'Zapatos'
+}, {
+  emoji: '🎩',
+  en: 'Hat',
+  es: 'Sombrero'
 }];
 
 /* ================================================================ */
@@ -1963,7 +2539,40 @@ function speak(text) {
   window.speechSynthesis.cancel();
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang = 'en-US';
-  utter.rate = 0.88;
+  utter.rate = AUDIO_SETTINGS.rate;
+  window.speechSynthesis.speak(utter);
+  return utter;
+}
+function charIndexToWordIndex(text, charIndex) {
+  const words = text.split(' ');
+  let pos = 0;
+  for (let i = 0; i < words.length; i++) {
+    const end = pos + words[i].length;
+    if (charIndex >= pos && charIndex <= end) return i;
+    pos = end + 1;
+  }
+  return words.length - 1;
+}
+function speakKaraoke(text, onWord, onDone) {
+  if (!('speechSynthesis' in window)) {
+    if (onDone) onDone();
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'en-US';
+  utter.rate = AUDIO_SETTINGS.rate;
+  utter.onboundary = e => {
+    if (typeof e.charIndex === 'number') onWord(charIndexToWordIndex(text, e.charIndex));
+  };
+  utter.onend = () => {
+    onWord(-1);
+    if (onDone) onDone();
+  };
+  utter.onerror = () => {
+    onWord(-1);
+    if (onDone) onDone();
+  };
   window.speechSynthesis.speak(utter);
 }
 function normalizeText(s) {
@@ -1978,6 +2587,16 @@ function shuffleArr(arr) {
     a[j] = tmp;
   }
   return a;
+}
+function scrambleWord(word) {
+  if (word.length <= 1) return word;
+  let s = word;
+  let attempts = 0;
+  while (s === word && attempts < 10) {
+    s = shuffleArr(word.split('')).join('');
+    attempts++;
+  }
+  return s;
 }
 function todayKey() {
   return new Date().toISOString().slice(0, 10);
@@ -2035,6 +2654,158 @@ function getDueWords(progress) {
   });
   return list;
 }
+
+/* ================================================================ */
+/* XP, NIVELES Y LOGROS                                              */
+/* ================================================================ */
+
+function computeXP(p) {
+  let xp = 0;
+  xp += p.knownWords.length * 10;
+  xp += Object.values(p.grammarScores).reduce((s, sc) => s + sc * 5, 0);
+  xp += Object.values(p.readingScores).reduce((s, sc) => s + sc * 5, 0);
+  xp += p.practicedPhrases.length * 8;
+  xp += p.sentencesCompleted.length * 12;
+  xp += p.dictationDone.length * 8;
+  xp += p.translationDone.length * 10;
+  xp += p.clozeDone.length * 10;
+  xp += (p.irregularVerbsDone || []).length * 8;
+  xp += (p.idiomsLearned || []).length * 8;
+  xp += (p.emojiCorrectCount || 0) * 3;
+  xp += (p.anagramsDone || []).length * 8;
+  xp += (p.achievementsUnlocked || []).length * 25;
+  return xp;
+}
+const LEVELS = [{
+  name: 'A1',
+  min: 0
+}, {
+  name: 'A1+',
+  min: 150
+}, {
+  name: 'A2',
+  min: 350
+}, {
+  name: 'A2+',
+  min: 600
+}, {
+  name: 'B1',
+  min: 900
+}, {
+  name: 'B1+',
+  min: 1300
+}, {
+  name: 'B2',
+  min: 1800
+}, {
+  name: 'B2+',
+  min: 2400
+}];
+function computeLevel(xp) {
+  let current = LEVELS[0];
+  let next = LEVELS[1] || null;
+  for (let i = 0; i < LEVELS.length; i++) {
+    if (xp >= LEVELS[i].min) {
+      current = LEVELS[i];
+      next = LEVELS[i + 1] || null;
+    }
+  }
+  const span = next ? next.min - current.min : 1;
+  const into = next ? xp - current.min : span;
+  const pct = next ? Math.min(100, Math.round(into / span * 100)) : 100;
+  return {
+    current,
+    next,
+    xp,
+    pct
+  };
+}
+const ACHIEVEMENTS = [{
+  id: 'first-word',
+  title: 'Primeras palabras',
+  description: 'Marca tu primera palabra como aprendida.',
+  check: p => p.knownWords.length >= 1
+}, {
+  id: 'words-25',
+  title: 'Coleccionista',
+  description: 'Aprende 25 palabras.',
+  check: p => p.knownWords.length >= 25
+}, {
+  id: 'words-50',
+  title: 'Vocabulario amplio',
+  description: 'Aprende 50 palabras.',
+  check: p => p.knownWords.length >= 50
+}, {
+  id: 'words-100',
+  title: 'Vocabulario experto',
+  description: 'Aprende 100 palabras.',
+  check: p => p.knownWords.length >= 100
+}, {
+  id: 'words-200',
+  title: 'Maestro del vocabulario',
+  description: 'Aprende las 200 palabras.',
+  check: p => p.knownWords.length >= 200
+}, {
+  id: 'grammar-5',
+  title: 'Estudiante de gramática',
+  description: 'Completa 5 lecciones de gramática.',
+  check: p => Object.keys(p.grammarScores).length >= 5
+}, {
+  id: 'grammar-all',
+  title: 'Gramático',
+  description: 'Completa las 18 lecciones de gramática.',
+  check: p => Object.keys(p.grammarScores).length >= 18
+}, {
+  id: 'reading-all',
+  title: 'Lector',
+  description: 'Completa las 8 lecturas.',
+  check: p => Object.keys(p.readingScores).length >= 8
+}, {
+  id: 'speaking-10',
+  title: 'Buena pronunciación',
+  description: 'Practica 10 frases en voz alta.',
+  check: p => p.practicedPhrases.length >= 10
+}, {
+  id: 'streak-3',
+  title: 'Constancia',
+  description: 'Practica 3 días seguidos.',
+  check: p => computeStreak(p.visitDates) >= 3
+}, {
+  id: 'streak-7',
+  title: 'Una semana completa',
+  description: 'Practica 7 días seguidos.',
+  check: p => computeStreak(p.visitDates) >= 7
+}, {
+  id: 'streak-30',
+  title: 'Hábito imparable',
+  description: 'Practica 30 días seguidos.',
+  check: p => computeStreak(p.visitDates) >= 30
+}, {
+  id: 'sentences-all',
+  title: 'Constructor de oraciones',
+  description: 'Completa los 10 ejercicios de construir oraciones.',
+  check: p => p.sentencesCompleted.length >= 10
+}, {
+  id: 'exercises-25',
+  title: 'Práctica activa',
+  description: 'Completa 25 ejercicios de dictado, traducir o completar.',
+  check: p => p.dictationDone.length + p.translationDone.length + p.clozeDone.length >= 25
+}, {
+  id: 'verbs-all',
+  title: 'Verbos irregulares',
+  description: 'Aprende los 20 verbos irregulares.',
+  check: p => (p.irregularVerbsDone || []).length >= 20
+}, {
+  id: 'idioms-all',
+  title: 'Habla como nativo',
+  description: 'Aprende las 15 frases idiomáticas.',
+  check: p => (p.idiomsLearned || []).length >= 15
+}, {
+  id: 'timeattack',
+  title: 'Contra el reloj',
+  description: 'Completa un desafío de contrarreloj.',
+  check: p => (p.timeAttackBest || 0) > 0
+}];
 
 /* --- Almacenamiento: usa window.storage (Claude) si existe, si no localStorage (sitio real) --- */
 function hasCloudStorage() {
@@ -2111,6 +2882,58 @@ async function gistRestore(token, gistId) {
 /* COMPONENTES DE UI COMPARTIDOS                                     */
 /* ================================================================ */
 
+function ProgressRing({
+  pct,
+  color,
+  size = 40,
+  strokeWidth = 3.5,
+  children
+}) {
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - Math.min(100, Math.max(0, pct)) / 100 * circumference;
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: 'relative',
+      width: size,
+      height: size
+    }
+  }, /*#__PURE__*/React.createElement("svg", {
+    width: size,
+    height: size,
+    style: {
+      transform: 'rotate(-90deg)'
+    }
+  }, /*#__PURE__*/React.createElement("circle", {
+    cx: size / 2,
+    cy: size / 2,
+    r: radius,
+    stroke: COLORS.surfaceRaised,
+    strokeWidth: strokeWidth,
+    fill: "none"
+  }), /*#__PURE__*/React.createElement("circle", {
+    cx: size / 2,
+    cy: size / 2,
+    r: radius,
+    stroke: color,
+    strokeWidth: strokeWidth,
+    fill: "none",
+    strokeDasharray: circumference,
+    strokeDashoffset: offset,
+    strokeLinecap: "round",
+    style: {
+      transition: 'stroke-dashoffset .6s cubic-bezier(.4,.2,.2,1)'
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: 'absolute',
+      inset: 0,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
+    }
+  }, children));
+}
 function StatPill({
   done,
   total,
@@ -2264,9 +3087,10 @@ function ExerciseRunner({
     }));
   };
   const verify = () => {
-    const score = item.questions.filter((q, i) => answers[i] === q.answer).length;
+    const wrongIdx = item.questions.map((q, i) => answers[i] === q.answer ? -1 : i).filter(i => i !== -1);
+    const score = item.questions.length - wrongIdx.length;
     setChecked(true);
-    onComplete(item.id, score);
+    onComplete(item.id, score, wrongIdx);
   };
   const retry = () => {
     setAnswers({});
@@ -2407,9 +3231,9 @@ function TypedAnswerExercise({
 function Header({
   view,
   setView,
-  overallPct,
+  level,
   streak,
-  onOpenCloud
+  onOpenSettings
 }) {
   return /*#__PURE__*/React.createElement("header", {
     style: {
@@ -2450,20 +3274,21 @@ function Header({
     className: "flex items-center gap-1 text-xs sm:text-sm"
   }, /*#__PURE__*/React.createElement(IconFlame, {
     size: 16
-  }), streak), /*#__PURE__*/React.createElement("span", {
+  }), streak), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setView('logros'),
     style: {
       fontFamily: FONT_MONO,
       color: COLORS.amber,
       borderColor: COLORS.border
     },
-    className: "text-xs sm:text-sm border rounded-full px-3 py-1"
-  }, overallPct, "%"), /*#__PURE__*/React.createElement("button", {
-    onClick: onOpenCloud,
+    className: "text-xs sm:text-sm border rounded-full px-3 py-1 hover:opacity-80 transition"
+  }, level.current.name), /*#__PURE__*/React.createElement("button", {
+    onClick: onOpenSettings,
     style: {
       color: COLORS.textMuted,
       borderColor: COLORS.border
     },
-    "aria-label": "Sincronización en la nube",
+    "aria-label": "Ajustes",
     className: "border rounded-full p-1.5 hover:opacity-80 transition"
   }, /*#__PURE__*/React.createElement(IconSettings, {
     size: 16
@@ -2485,6 +3310,7 @@ function DashboardCard({
   onClick,
   delay
 }) {
+  const pct = total ? Math.round(done / total * 100) : 0;
   return /*#__PURE__*/React.createElement("button", {
     onClick: onClick,
     style: {
@@ -2495,7 +3321,7 @@ function DashboardCard({
     className: "card-enter text-left border rounded-2xl p-5 flex flex-col gap-3 hover:-translate-y-0.5 transition-transform duration-150"
   }, /*#__PURE__*/React.createElement("div", {
     className: "flex items-center justify-between"
-  }, /*#__PURE__*/React.createElement("div", {
+  }, badge != null ? /*#__PURE__*/React.createElement("div", {
     style: {
       background: `${color}1A`,
       color
@@ -2503,6 +3329,15 @@ function DashboardCard({
     className: "w-10 h-10 rounded-xl flex items-center justify-center"
   }, /*#__PURE__*/React.createElement(IconComp, {
     size: 20
+  })) : /*#__PURE__*/React.createElement(ProgressRing, {
+    pct: pct,
+    color: color,
+    size: 40
+  }, /*#__PURE__*/React.createElement(IconComp, {
+    size: 17,
+    style: {
+      color
+    }
   })), badge != null ? /*#__PURE__*/React.createElement("span", {
     style: {
       fontFamily: FONT_MONO,
@@ -2531,6 +3366,7 @@ function Dashboard({
   setView,
   stats,
   dueCount,
+  level,
   onResetRequest
 }) {
   const {
@@ -2566,20 +3402,25 @@ function Dashboard({
       background: COLORS.surfaceRaised,
       borderColor: COLORS.border
     },
-    className: "border rounded-full h-2.5 overflow-hidden mb-6"
+    className: "border rounded-full h-2.5 overflow-hidden mb-2"
   }, /*#__PURE__*/React.createElement("div", {
     className: "progress-fill h-full rounded-full",
     style: {
       width: overallPct + '%',
       background: `linear-gradient(90deg, ${COLORS.teal}, ${COLORS.indigo})`
     }
-  })), /*#__PURE__*/React.createElement("div", {
+  })), /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: COLORS.textMuted
+    },
+    className: "text-xs mb-6"
+  }, overallPct, "% del contenido completado · Nivel ", level.current.name), /*#__PURE__*/React.createElement("div", {
     className: "grid grid-cols-1 sm:grid-cols-2 gap-4"
   }, /*#__PURE__*/React.createElement(DashboardCard, {
     delay: 0,
     icon: IconBook,
     title: "Vocabulario",
-    description: "200 palabras en 20 categorías, con audio y juego de emparejar",
+    description: "200 palabras en 20 categorías, con audio, emparejar, adivina y modismos",
     color: COLORS.teal,
     done: doneWords,
     total: totalWords,
@@ -2588,7 +3429,7 @@ function Dashboard({
     delay: 40,
     icon: IconPencil,
     title: "Gramática",
-    description: "18 lecciones con explicación y ejercicios",
+    description: "18 lecciones y verbos irregulares",
     color: COLORS.indigo,
     done: doneGrammar,
     total: totalGrammar,
@@ -2597,7 +3438,7 @@ function Dashboard({
     delay: 80,
     icon: IconPage,
     title: "Lectura",
-    description: "5 textos con preguntas de comprensión",
+    description: "8 textos con preguntas de comprensión",
     color: COLORS.amber,
     done: doneReading,
     total: totalReading,
@@ -2606,7 +3447,7 @@ function Dashboard({
     delay: 120,
     icon: IconMic,
     title: "Pronunciación",
-    description: "20 frases para escuchar y repetir en voz alta",
+    description: "20 frases, con modo karaoke y práctica de voz",
     color: COLORS.rose,
     done: doneSpeaking,
     total: totalSpeaking,
@@ -2624,7 +3465,7 @@ function Dashboard({
     delay: 200,
     icon: IconChecklist,
     title: "Ejercicios",
-    description: "Dictado, traducir escribiendo y completar frases",
+    description: "Dictado, traducir, completar y anagramas",
     color: COLORS.indigo,
     done: doneExercises,
     total: totalExercises,
@@ -2637,6 +3478,22 @@ function Dashboard({
     color: COLORS.amber,
     badge: dueCount > 0 ? dueCount + ' hoy' : 'Al día',
     onClick: () => setView('repaso')
+  }), /*#__PURE__*/React.createElement(DashboardCard, {
+    delay: 280,
+    icon: IconBolt,
+    title: "Contrarreloj",
+    description: "Traduce tantas palabras como puedas en 60 segundos",
+    color: COLORS.rose,
+    badge: "Jugar",
+    onClick: () => setView('contrarreloj')
+  }), /*#__PURE__*/React.createElement(DashboardCard, {
+    delay: 320,
+    icon: IconTrophy,
+    title: "Logros",
+    description: "Tu nivel, tu experiencia y tus medallas",
+    color: COLORS.amber,
+    badge: level.current.name,
+    onClick: () => setView('logros')
   })), /*#__PURE__*/React.createElement("button", {
     onClick: onResetRequest,
     style: {
@@ -2837,13 +3694,166 @@ function MatchingGame({
     size: 13
   }), "Mezclar de nuevo"));
 }
+function EmojiQuiz({
+  onCorrect
+}) {
+  const buildOptions = i => {
+    const correct = EMOJI_ITEMS[i];
+    const distractors = shuffleArr(EMOJI_ITEMS.filter(it => it.en !== correct.en)).slice(0, 3);
+    return shuffleArr([correct, ...distractors]);
+  };
+  const [idx, setIdx] = useState(0);
+  const [options, setOptions] = useState(() => buildOptions(0));
+  const [status, setStatus] = useState(null);
+  const [selected, setSelected] = useState(null);
+  const current = EMOJI_ITEMS[idx];
+  const pick = opt => {
+    if (status) return;
+    setSelected(opt.en);
+    const ok = opt.en === current.en;
+    setStatus(ok ? 'correct' : 'wrong');
+    if (ok) onCorrect();
+  };
+  const next = () => {
+    const n = (idx + 1) % EMOJI_ITEMS.length;
+    setIdx(n);
+    setOptions(buildOptions(n));
+    setStatus(null);
+    setSelected(null);
+  };
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: COLORS.textMuted
+    },
+    className: "text-sm mb-1"
+  }, "¿Qué palabra es esta?"), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontFamily: FONT_MONO,
+      color: COLORS.textMuted
+    },
+    className: "text-xs mb-4"
+  }, idx + 1, " de ", EMOJI_ITEMS.length), /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: COLORS.surface,
+      borderColor: COLORS.border
+    },
+    className: "border rounded-2xl p-8 text-center mb-4"
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 64,
+      lineHeight: 1
+    }
+  }, current.emoji)), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-2 gap-2 mb-4"
+  }, options.map(opt => {
+    let border = COLORS.border,
+      bg = COLORS.surface,
+      color = COLORS.text;
+    if (status && opt.en === current.en) {
+      border = COLORS.teal;
+      bg = `${COLORS.teal}1A`;
+      color = COLORS.teal;
+    } else if (status && opt.en === selected) {
+      border = COLORS.rose;
+      bg = `${COLORS.rose}1A`;
+      color = COLORS.rose;
+    }
+    return /*#__PURE__*/React.createElement("button", {
+      key: opt.en,
+      onClick: () => pick(opt),
+      disabled: !!status,
+      style: {
+        borderColor: border,
+        background: bg,
+        color
+      },
+      className: "border rounded-xl px-4 py-3 text-sm transition"
+    }, opt.en);
+  })), status && /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center gap-3 pop"
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: status === 'correct' ? COLORS.teal : COLORS.rose
+    },
+    className: "text-sm"
+  }, status === 'correct' ? '¡Correcto! 🎉' : `Era: ${current.en} (${current.es})`), /*#__PURE__*/React.createElement("button", {
+    onClick: next,
+    style: {
+      color: COLORS.teal
+    },
+    className: "text-sm underline underline-offset-2"
+  }, "Siguiente →")));
+}
+function IdiomsList({
+  progress,
+  onLearn
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "flex flex-col gap-3"
+  }, IDIOMS.map((idiom, idx) => {
+    const learned = progress.idiomsLearned.includes(idx);
+    return /*#__PURE__*/React.createElement("div", {
+      key: idx,
+      style: {
+        background: COLORS.surface,
+        borderColor: learned ? COLORS.teal : COLORS.border
+      },
+      className: "border rounded-2xl p-4"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "flex items-center justify-between gap-3"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "min-w-0"
+    }, /*#__PURE__*/React.createElement("p", {
+      style: {
+        fontFamily: FONT_DISPLAY,
+        color: COLORS.text
+      },
+      className: "text-base"
+    }, idiom.en), /*#__PURE__*/React.createElement("p", {
+      style: {
+        color: COLORS.teal
+      },
+      className: "text-sm mt-0.5"
+    }, idiom.es), /*#__PURE__*/React.createElement("p", {
+      style: {
+        color: COLORS.textMuted
+      },
+      className: "text-xs mt-1 italic"
+    }, idiom.meaning)), /*#__PURE__*/React.createElement("div", {
+      className: "flex flex-col items-end gap-2 shrink-0"
+    }, /*#__PURE__*/React.createElement("button", {
+      onClick: () => speak(idiom.en),
+      style: {
+        color: COLORS.textMuted,
+        borderColor: COLORS.border
+      },
+      className: "border rounded-full p-2 hover:opacity-80 transition",
+      "aria-label": "Escuchar"
+    }, /*#__PURE__*/React.createElement(IconVolume, {
+      size: 14
+    })), /*#__PURE__*/React.createElement("button", {
+      onClick: () => onLearn(idx),
+      style: {
+        color: learned ? COLORS.bg : COLORS.textMuted,
+        background: learned ? COLORS.teal : 'transparent',
+        borderColor: learned ? COLORS.teal : COLORS.border
+      },
+      className: "flex items-center gap-1 text-xs border rounded-full px-2.5 py-1 transition"
+    }, /*#__PURE__*/React.createElement(IconCheck, {
+      size: 12
+    }), learned ? 'Aprendida' : 'Marcar'))));
+  }));
+}
 function VocabView({
   progress,
-  toggleKnownWord
+  toggleKnownWord,
+  onEmojiCorrect,
+  onLearnIdiom
 }) {
   const [category, setCategory] = useState(VOCAB_CATEGORIES[0].id);
   const [mode, setMode] = useState('tarjetas');
   const active = VOCAB_CATEGORIES.find(c => c.id === category);
+  const needsCategory = mode === 'tarjetas' || mode === 'emparejar';
   return /*#__PURE__*/React.createElement("div", {
     className: "max-w-3xl mx-auto px-5 py-8 view-enter"
   }, /*#__PURE__*/React.createElement("h2", {
@@ -2853,7 +3863,17 @@ function VocabView({
     },
     className: "text-2xl font-semibold mb-4"
   }, "Vocabulario"), /*#__PURE__*/React.createElement("div", {
-    className: "flex flex-wrap gap-2 mb-4"
+    className: "flex gap-2 mb-4 flex-wrap"
+  }, [['tarjetas', 'Tarjetas'], ['emparejar', 'Emparejar'], ['adivina', 'Adivina'], ['modismos', 'Modismos']].map(([id, label]) => /*#__PURE__*/React.createElement("button", {
+    key: id,
+    onClick: () => setMode(id),
+    style: {
+      color: mode === id ? COLORS.text : COLORS.textMuted,
+      borderColor: mode === id ? COLORS.text : 'transparent'
+    },
+    className: "text-sm pb-1.5 border-b-2 transition"
+  }, label))), needsCategory && /*#__PURE__*/React.createElement("div", {
+    className: "flex flex-wrap gap-2 mb-6"
   }, VOCAB_CATEGORIES.map(c => /*#__PURE__*/React.createElement("button", {
     key: c.id,
     onClick: () => setCategory(c.id),
@@ -2863,17 +3883,7 @@ function VocabView({
       borderColor: category === c.id ? c.accent : COLORS.border
     },
     className: "text-sm border rounded-full px-3.5 py-1.5 transition"
-  }, c.name))), /*#__PURE__*/React.createElement("div", {
-    className: "flex gap-2 mb-6"
-  }, ['tarjetas', 'emparejar'].map(m => /*#__PURE__*/React.createElement("button", {
-    key: m,
-    onClick: () => setMode(m),
-    style: {
-      color: mode === m ? COLORS.text : COLORS.textMuted,
-      borderColor: mode === m ? COLORS.text : 'transparent'
-    },
-    className: "text-sm pb-1.5 border-b-2 transition capitalize"
-  }, m))), mode === 'tarjetas' ? /*#__PURE__*/React.createElement("div", {
+  }, c.name))), mode === 'tarjetas' && /*#__PURE__*/React.createElement("div", {
     className: "grid grid-cols-1 sm:grid-cols-2 gap-4"
   }, active.words.map((word, idx) => {
     const wordId = `${active.id}-${idx}`;
@@ -2883,9 +3893,14 @@ function VocabView({
       known: progress.knownWords.includes(wordId),
       onToggle: () => toggleKnownWord(wordId)
     });
-  })) : /*#__PURE__*/React.createElement(MatchingGame, {
+  })), mode === 'emparejar' && /*#__PURE__*/React.createElement(MatchingGame, {
     key: active.id,
     category: active
+  }), mode === 'adivina' && /*#__PURE__*/React.createElement(EmojiQuiz, {
+    onCorrect: onEmojiCorrect
+  }), mode === 'modismos' && /*#__PURE__*/React.createElement(IdiomsList, {
+    progress: progress,
+    onLearn: onLearnIdiom
   }));
 }
 
@@ -2893,11 +3908,150 @@ function VocabView({
 /* GRAMÁTICA                                                         */
 /* ================================================================ */
 
+function IrregularVerbsTable({
+  progress
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "overflow-x-auto"
+  }, /*#__PURE__*/React.createElement("table", {
+    className: "w-full text-sm"
+  }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", {
+    style: {
+      color: COLORS.textMuted
+    },
+    className: "text-left"
+  }, /*#__PURE__*/React.createElement("th", {
+    className: "pb-2 pr-3 font-normal"
+  }, "Base"), /*#__PURE__*/React.createElement("th", {
+    className: "pb-2 pr-3 font-normal"
+  }, "Past"), /*#__PURE__*/React.createElement("th", {
+    className: "pb-2 pr-3 font-normal"
+  }, "Participle"), /*#__PURE__*/React.createElement("th", {
+    className: "pb-2 font-normal"
+  }, "Español"))), /*#__PURE__*/React.createElement("tbody", null, IRREGULAR_VERBS.map((v, i) => /*#__PURE__*/React.createElement("tr", {
+    key: i,
+    style: {
+      borderTop: `1px solid ${COLORS.border}`
+    }
+  }, /*#__PURE__*/React.createElement("td", {
+    className: "py-2 pr-3"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => speak(v.base),
+    style: {
+      color: progress.irregularVerbsDone.includes(i) ? COLORS.teal : COLORS.text
+    },
+    className: "flex items-center gap-1.5 hover:opacity-80 transition"
+  }, /*#__PURE__*/React.createElement(IconVolume, {
+    size: 12
+  }), v.base)), /*#__PURE__*/React.createElement("td", {
+    style: {
+      color: COLORS.indigo
+    },
+    className: "py-2 pr-3"
+  }, v.past), /*#__PURE__*/React.createElement("td", {
+    style: {
+      color: COLORS.amber
+    },
+    className: "py-2 pr-3"
+  }, v.participle), /*#__PURE__*/React.createElement("td", {
+    style: {
+      color: COLORS.textMuted
+    },
+    className: "py-2"
+  }, v.es))))));
+}
+function IrregularVerbsQuiz({
+  progress,
+  onLearn
+}) {
+  const [idx, setIdx] = useState(0);
+  const verb = IRREGULAR_VERBS[idx];
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: COLORS.surface,
+      borderColor: COLORS.border
+    },
+    className: "border rounded-2xl p-6"
+  }, /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: COLORS.textMuted
+    },
+    className: "text-sm mb-1"
+  }, "Escribe el pasado simple (past) de:"), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontFamily: FONT_DISPLAY,
+      color: COLORS.text
+    },
+    className: "text-2xl mb-1"
+  }, verb.base), /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: COLORS.textMuted
+    },
+    className: "text-xs mb-4"
+  }, verb.es), /*#__PURE__*/React.createElement(TypedAnswerExercise, {
+    key: idx,
+    accepted: verb.past.split('/'),
+    onResult: ok => ok && onLearn(idx)
+  }), /*#__PURE__*/React.createElement(NavRow, {
+    idx: idx,
+    total: IRREGULAR_VERBS.length,
+    setIdx: setIdx
+  }));
+}
+function IrregularVerbsSection({
+  progress,
+  onLearn
+}) {
+  const [sub, setSub] = useState('tabla');
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "flex gap-2 mb-6"
+  }, [['tabla', 'Tabla'], ['practica', 'Practicar']].map(([id, label]) => /*#__PURE__*/React.createElement("button", {
+    key: id,
+    onClick: () => setSub(id),
+    style: {
+      background: sub === id ? COLORS.indigo : 'transparent',
+      color: sub === id ? COLORS.bg : COLORS.textMuted,
+      borderColor: sub === id ? COLORS.indigo : COLORS.border
+    },
+    className: "text-sm border rounded-full px-3.5 py-1.5 transition"
+  }, label))), sub === 'tabla' ? /*#__PURE__*/React.createElement(IrregularVerbsTable, {
+    progress: progress
+  }) : /*#__PURE__*/React.createElement(IrregularVerbsQuiz, {
+    progress: progress,
+    onLearn: onLearn
+  }));
+}
 function GrammarView({
   progress,
-  onComplete
+  onComplete,
+  onLearnVerb
 }) {
+  const [section, setSection] = useState('lecciones');
   const [active, setActive] = useState(null);
+  if (section === 'verbos') {
+    return /*#__PURE__*/React.createElement("div", {
+      className: "max-w-3xl mx-auto px-5 py-8 view-enter"
+    }, /*#__PURE__*/React.createElement("h2", {
+      style: {
+        fontFamily: FONT_DISPLAY,
+        color: COLORS.text
+      },
+      className: "text-2xl font-semibold mb-4"
+    }, "Gramática"), /*#__PURE__*/React.createElement("div", {
+      className: "flex gap-2 mb-6"
+    }, [['lecciones', 'Lecciones'], ['verbos', 'Verbos irregulares']].map(([id, label]) => /*#__PURE__*/React.createElement("button", {
+      key: id,
+      onClick: () => setSection(id),
+      style: {
+        color: section === id ? COLORS.text : COLORS.textMuted,
+        borderColor: section === id ? COLORS.text : 'transparent'
+      },
+      className: "text-sm pb-1.5 border-b-2 transition"
+    }, label))), /*#__PURE__*/React.createElement(IrregularVerbsSection, {
+      progress: progress,
+      onLearn: onLearnVerb
+    }));
+  }
   if (!active) {
     return /*#__PURE__*/React.createElement("div", {
       className: "max-w-3xl mx-auto px-5 py-8 view-enter"
@@ -2906,8 +4060,18 @@ function GrammarView({
         fontFamily: FONT_DISPLAY,
         color: COLORS.text
       },
-      className: "text-2xl font-semibold mb-6"
-    }, "Gramática"), /*#__PURE__*/React.createElement(LessonList, {
+      className: "text-2xl font-semibold mb-4"
+    }, "Gramática"), /*#__PURE__*/React.createElement("div", {
+      className: "flex gap-2 mb-6"
+    }, [['lecciones', 'Lecciones'], ['verbos', 'Verbos irregulares']].map(([id, label]) => /*#__PURE__*/React.createElement("button", {
+      key: id,
+      onClick: () => setSection(id),
+      style: {
+        color: section === id ? COLORS.text : COLORS.textMuted,
+        borderColor: section === id ? COLORS.text : 'transparent'
+      },
+      className: "text-sm pb-1.5 border-b-2 transition"
+    }, label))), /*#__PURE__*/React.createElement(LessonList, {
       items: GRAMMAR_LESSONS,
       scores: progress.grammarScores,
       onSelect: setActive,
@@ -3025,11 +4189,18 @@ function SpeakingView({
   const [results, setResults] = useState({});
   const [errorMsg, setErrorMsg] = useState('');
   const [supported, setSupported] = useState(true);
+  const [karaokeIdx, setKaraokeIdx] = useState(null);
+  const [karaokeWord, setKaraokeWord] = useState(-1);
   useEffect(() => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     setSupported(!!SR);
   }, []);
   const activeGroup = SPEAKING_GROUPS.find(g => g.id === group);
+  const playKaraoke = (globalIdx, phrase) => {
+    setKaraokeIdx(globalIdx);
+    setKaraokeWord(-1);
+    speakKaraoke(phrase.en, w => setKaraokeWord(w), () => setKaraokeIdx(null));
+  };
   const practice = (globalIdx, phrase) => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) return;
@@ -3071,7 +4242,7 @@ function SpeakingView({
       color: COLORS.textMuted
     },
     className: "text-sm mb-4"
-  }, "Escucha cada frase y luego repítela en voz alta."), /*#__PURE__*/React.createElement("div", {
+  }, "Toca la frase para el modo karaoke (resalta palabra por palabra), o el micrófono para practicar."), /*#__PURE__*/React.createElement("div", {
     className: "flex flex-wrap gap-2 mb-6"
   }, SPEAKING_GROUPS.map(g => /*#__PURE__*/React.createElement("button", {
     key: g.id,
@@ -3102,6 +4273,8 @@ function SpeakingView({
     const globalIdx = SPEAKING_PHRASES.indexOf(phrase);
     const result = results[globalIdx];
     const practiced = progress.practicedPhrases.includes(globalIdx);
+    const isKaraoke = karaokeIdx === globalIdx;
+    const words = phrase.en.split(' ');
     return /*#__PURE__*/React.createElement("div", {
       key: globalIdx,
       style: {
@@ -3111,15 +4284,22 @@ function SpeakingView({
       className: "border rounded-2xl p-4"
     }, /*#__PURE__*/React.createElement("div", {
       className: "flex items-center justify-between gap-3"
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "min-w-0"
+    }, /*#__PURE__*/React.createElement("button", {
+      onClick: () => playKaraoke(globalIdx, phrase),
+      className: "min-w-0 text-left"
     }, /*#__PURE__*/React.createElement("p", {
       style: {
         fontFamily: FONT_DISPLAY,
         color: COLORS.text
       },
       className: "text-base truncate"
-    }, phrase.en), /*#__PURE__*/React.createElement("p", {
+    }, isKaraoke ? words.map((w, i) => /*#__PURE__*/React.createElement("span", {
+      key: i,
+      style: {
+        color: i === karaokeWord ? COLORS.rose : COLORS.text,
+        fontWeight: i === karaokeWord ? 700 : 500
+      }
+    }, w, i < words.length - 1 ? ' ' : '')) : phrase.en), /*#__PURE__*/React.createElement("p", {
       style: {
         color: COLORS.textMuted
       },
@@ -3331,12 +4511,15 @@ function ExercisesView({
   progress,
   onDictation,
   onTranslation,
-  onCloze
+  onCloze,
+  onAnagram
 }) {
   const [mode, setMode] = useState('dictado');
   const [dictIdx, setDictIdx] = useState(0);
   const [transIdx, setTransIdx] = useState(0);
   const [clozeIdx, setClozeIdx] = useState(0);
+  const [anagramIdx, setAnagramIdx] = useState(0);
+  const scrambled = useState(() => ANAGRAM_ITEMS.map(it => scrambleWord(it.word)))[0];
   return /*#__PURE__*/React.createElement("div", {
     className: "max-w-3xl mx-auto px-5 py-8 view-enter"
   }, /*#__PURE__*/React.createElement("h2", {
@@ -3347,7 +4530,7 @@ function ExercisesView({
     className: "text-2xl font-semibold mb-4"
   }, "Ejercicios"), /*#__PURE__*/React.createElement("div", {
     className: "flex flex-wrap gap-2 mb-6"
-  }, [['dictado', 'Dictado'], ['traducir', 'Traducir'], ['completar', 'Completar']].map(([id, label]) => /*#__PURE__*/React.createElement("button", {
+  }, [['dictado', 'Dictado'], ['traducir', 'Traducir'], ['completar', 'Completar'], ['anagramas', 'Anagramas']].map(([id, label]) => /*#__PURE__*/React.createElement("button", {
     key: id,
     onClick: () => setMode(id),
     style: {
@@ -3408,6 +4591,33 @@ function ExercisesView({
     idx: transIdx,
     total: TRANSLATION_ITEMS.length,
     setIdx: setTransIdx
+  })), mode === 'anagramas' && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: COLORS.textMuted
+    },
+    className: "text-sm mb-1"
+  }, "Ordena las letras para formar la palabra"), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontFamily: FONT_MONO,
+      color: COLORS.textMuted
+    },
+    className: "text-xs mb-4"
+  }, anagramIdx + 1, " de ", ANAGRAM_ITEMS.length), /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: COLORS.surface,
+      borderColor: COLORS.border
+    },
+    className: "border rounded-2xl p-5"
+  }, /*#__PURE__*/React.createElement(TypedAnswerExercise, {
+    key: 'anagram' + anagramIdx,
+    prompt: scrambled[anagramIdx],
+    hint: 'Pista: ' + ANAGRAM_ITEMS[anagramIdx].es,
+    accepted: [ANAGRAM_ITEMS[anagramIdx].word],
+    onResult: ok => ok && onAnagram(anagramIdx)
+  })), /*#__PURE__*/React.createElement(NavRow, {
+    idx: anagramIdx,
+    total: ANAGRAM_ITEMS.length,
+    setIdx: setAnagramIdx
   })), mode === 'completar' && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
     style: {
       color: COLORS.textMuted
@@ -3604,7 +4814,247 @@ function ReviewView({
 /* PANEL DE NUBE (GitHub Gist + token)                                */
 /* ================================================================ */
 
-function CloudPanel({
+/* ================================================================ */
+/* LOGROS Y NIVEL                                                    */
+/* ================================================================ */
+
+function AchievementsView({
+  progress
+}) {
+  const level = computeLevel(computeXP(progress));
+  return /*#__PURE__*/React.createElement("div", {
+    className: "max-w-3xl mx-auto px-5 py-8 view-enter"
+  }, /*#__PURE__*/React.createElement("h2", {
+    style: {
+      fontFamily: FONT_DISPLAY,
+      color: COLORS.text
+    },
+    className: "text-2xl font-semibold mb-1"
+  }, "Logros"), /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: COLORS.textMuted
+    },
+    className: "text-sm mb-6"
+  }, "Nivel ", /*#__PURE__*/React.createElement("b", {
+    style: {
+      color: COLORS.text
+    }
+  }, level.current.name), " · ", /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontFamily: FONT_MONO
+    }
+  }, level.xp, " XP"), level.next ? ` · faltan ${level.next.min - level.xp} XP para ${level.next.name}` : ' · ¡nivel máximo!'), /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: COLORS.surfaceRaised,
+      borderColor: COLORS.border
+    },
+    className: "border rounded-full h-2.5 overflow-hidden mb-8"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "progress-fill h-full rounded-full",
+    style: {
+      width: level.pct + '%',
+      background: `linear-gradient(90deg, ${COLORS.amber}, ${COLORS.rose})`
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-1 sm:grid-cols-2 gap-3"
+  }, ACHIEVEMENTS.map(a => {
+    const earned = progress.achievementsUnlocked.includes(a.id);
+    return /*#__PURE__*/React.createElement("div", {
+      key: a.id,
+      style: {
+        background: COLORS.surface,
+        borderColor: earned ? COLORS.amber : COLORS.border,
+        opacity: earned ? 1 : 0.55
+      },
+      className: "border rounded-2xl p-4 flex items-start gap-3"
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        background: earned ? `${COLORS.amber}1A` : COLORS.surfaceRaised,
+        color: earned ? COLORS.amber : COLORS.textMuted
+      },
+      className: "w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+    }, earned ? /*#__PURE__*/React.createElement(IconCheckCircle, {
+      size: 18
+    }) : /*#__PURE__*/React.createElement(IconClock, {
+      size: 18
+    })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
+      style: {
+        color: COLORS.text
+      },
+      className: "text-sm font-medium"
+    }, a.title), /*#__PURE__*/React.createElement("p", {
+      style: {
+        color: COLORS.textMuted
+      },
+      className: "text-xs mt-0.5"
+    }, a.description)));
+  })));
+}
+
+/* ================================================================ */
+/* CONTRARRELOJ                                                      */
+/* ================================================================ */
+
+function TimeAttackView({
+  progress,
+  onFinish
+}) {
+  const [state, setState] = useState('ready');
+  const [timeLeft, setTimeLeft] = useState(60);
+  const [score, setScore] = useState(0);
+  const [current, setCurrent] = useState(null);
+  const [value, setValue] = useState('');
+  const [feedback, setFeedback] = useState(null);
+  const [allWords] = useState(() => VOCAB_CATEGORIES.flatMap(c => c.words));
+  const pickWord = () => allWords[Math.floor(Math.random() * allWords.length)];
+  const start = () => {
+    setState('playing');
+    setScore(0);
+    setTimeLeft(60);
+    setCurrent(pickWord());
+    setValue('');
+    setFeedback(null);
+  };
+  useEffect(() => {
+    if (state !== 'playing') return;
+    if (timeLeft <= 0) {
+      setState('done');
+      onFinish(score);
+      return;
+    }
+    const t = setTimeout(() => setTimeLeft(v => v - 1), 1000);
+    return () => clearTimeout(t);
+  }, [state, timeLeft]);
+  const submit = () => {
+    const ok = normalizeText(value) === normalizeText(current.en);
+    setFeedback(ok ? 'correct' : 'wrong');
+    if (ok) setScore(s => s + 1);
+    setTimeout(() => {
+      setCurrent(pickWord());
+      setValue('');
+      setFeedback(null);
+    }, 250);
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    className: "max-w-3xl mx-auto px-5 py-8 view-enter"
+  }, /*#__PURE__*/React.createElement("h2", {
+    style: {
+      fontFamily: FONT_DISPLAY,
+      color: COLORS.text
+    },
+    className: "text-2xl font-semibold mb-1"
+  }, "Contrarreloj"), /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: COLORS.textMuted
+    },
+    className: "text-sm mb-6"
+  }, "Traduce tantas palabras como puedas en 60 segundos."), state === 'ready' && /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: COLORS.surface,
+      borderColor: COLORS.border
+    },
+    className: "border rounded-2xl p-8 text-center"
+  }, /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: COLORS.textMuted
+    },
+    className: "text-sm mb-1"
+  }, "Tu récord"), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontFamily: FONT_MONO,
+      color: COLORS.amber
+    },
+    className: "text-3xl mb-6"
+  }, progress.timeAttackBest), /*#__PURE__*/React.createElement("button", {
+    onClick: start,
+    style: {
+      background: COLORS.amber,
+      color: COLORS.bg
+    },
+    className: "text-sm rounded-full px-6 py-2.5"
+  }, "Empezar")), state === 'playing' && current && /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: COLORS.surface,
+      borderColor: COLORS.border
+    },
+    className: "border rounded-2xl p-6"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex items-center justify-between mb-5"
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontFamily: FONT_MONO,
+      color: COLORS.rose
+    },
+    className: "text-lg"
+  }, "⏱ ", timeLeft, "s"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontFamily: FONT_MONO,
+      color: COLORS.teal
+    },
+    className: "text-lg"
+  }, score, " pts")), /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: COLORS.textMuted
+    },
+    className: "text-sm mb-1"
+  }, "¿Cómo se dice en inglés?"), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontFamily: FONT_DISPLAY,
+      color: COLORS.text
+    },
+    className: "text-2xl mb-4"
+  }, current.es), /*#__PURE__*/React.createElement("input", {
+    type: "text",
+    value: value,
+    onChange: e => setValue(e.target.value),
+    onKeyDown: e => e.key === 'Enter' && value.trim() && submit(),
+    style: {
+      background: COLORS.bg,
+      borderColor: feedback === 'wrong' ? COLORS.rose : feedback === 'correct' ? COLORS.teal : COLORS.border,
+      color: COLORS.text
+    },
+    className: "w-full border rounded-xl px-4 py-2.5 text-sm" + (feedback === 'wrong' ? " shake" : ""),
+    placeholder: "Escribe aquí…"
+  }), /*#__PURE__*/React.createElement("button", {
+    onClick: submit,
+    disabled: !value.trim(),
+    style: {
+      background: value.trim() ? COLORS.amber : COLORS.surfaceRaised,
+      color: value.trim() ? COLORS.bg : COLORS.textMuted
+    },
+    className: "text-sm rounded-full px-5 py-2 mt-3 transition"
+  }, "Enviar")), state === 'done' && /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: COLORS.surface,
+      borderColor: COLORS.border
+    },
+    className: "border rounded-2xl p-8 text-center pop"
+  }, /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: COLORS.text
+    },
+    className: "text-lg mb-1"
+  }, "¡Tiempo! 🎉"), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontFamily: FONT_MONO,
+      color: COLORS.amber
+    },
+    className: "text-3xl mb-1"
+  }, score, " palabras"), score > progress.timeAttackBest && /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: COLORS.teal
+    },
+    className: "text-sm mb-4"
+  }, "¡Nuevo récord! 🏆"), /*#__PURE__*/React.createElement("button", {
+    onClick: start,
+    style: {
+      background: COLORS.amber,
+      color: COLORS.bg
+    },
+    className: "text-sm rounded-full px-6 py-2.5 mt-2"
+  }, "Jugar de nuevo")));
+}
+function SettingsPanel({
   onClose,
   token,
   gistId,
@@ -3612,8 +5062,15 @@ function CloudPanel({
   forgetToken,
   saveGistId,
   progress,
-  applyRestoredProgress
+  applyRestoredProgress,
+  theme,
+  setTheme,
+  audioSpeed,
+  setAudioSpeed,
+  fontSize,
+  setFontSize
 }) {
+  const [tab, setTab] = useState('preferencias');
   const [tokenInput, setTokenInput] = useState(token || '');
   const [gistInput, setGistInput] = useState(gistId || '');
   const [status, setStatus] = useState('');
@@ -3665,6 +5122,18 @@ function CloudPanel({
       setBusy(false);
     }
   };
+  const choiceRow = (options, current, onPick) => /*#__PURE__*/React.createElement("div", {
+    className: "flex gap-2 mt-1.5 mb-4 flex-wrap"
+  }, options.map(([id, label]) => /*#__PURE__*/React.createElement("button", {
+    key: id,
+    onClick: () => onPick(id),
+    style: {
+      background: current === id ? COLORS.indigo : 'transparent',
+      color: current === id ? COLORS.bg : COLORS.textMuted,
+      borderColor: current === id ? COLORS.indigo : COLORS.border
+    },
+    className: "text-sm border rounded-full px-3.5 py-1.5 transition"
+  }, label)));
   return /*#__PURE__*/React.createElement("div", {
     style: {
       background: 'rgba(0,0,0,0.6)'
@@ -3684,19 +5153,44 @@ function CloudPanel({
       color: COLORS.text
     },
     className: "text-lg flex items-center gap-2"
-  }, /*#__PURE__*/React.createElement(IconCloud, {
+  }, /*#__PURE__*/React.createElement(IconSettings, {
     size: 18,
     style: {
       color: COLORS.teal
     }
-  }), "Copia en la nube"), /*#__PURE__*/React.createElement("button", {
+  }), "Ajustes"), /*#__PURE__*/React.createElement("button", {
     onClick: onClose,
     style: {
       color: COLORS.textMuted
     }
   }, /*#__PURE__*/React.createElement(IconX, {
     size: 18
-  }))), /*#__PURE__*/React.createElement("p", {
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "flex gap-2 mb-5"
+  }, [['preferencias', 'Preferencias'], ['nube', 'Nube']].map(([id, label]) => /*#__PURE__*/React.createElement("button", {
+    key: id,
+    onClick: () => setTab(id),
+    style: {
+      color: tab === id ? COLORS.text : COLORS.textMuted,
+      borderColor: tab === id ? COLORS.text : 'transparent'
+    },
+    className: "text-sm pb-1.5 border-b-2 transition"
+  }, label))), tab === 'preferencias' && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    style: {
+      color: COLORS.text
+    },
+    className: "text-xs font-medium"
+  }, "Tema"), choiceRow([['dark', 'Oscuro'], ['light', 'Claro']], theme, setTheme), /*#__PURE__*/React.createElement("label", {
+    style: {
+      color: COLORS.text
+    },
+    className: "text-xs font-medium"
+  }, "Velocidad de audio"), choiceRow([['lento', 'Lento'], ['normal', 'Normal'], ['rapido', 'Rápido']], audioSpeed, setAudioSpeed), /*#__PURE__*/React.createElement("label", {
+    style: {
+      color: COLORS.text
+    },
+    className: "text-xs font-medium"
+  }, "Tamaño de texto"), choiceRow([['pequeno', 'Pequeño'], ['normal', 'Normal'], ['grande', 'Grande']], fontSize, setFontSize)), tab === 'nube' && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("p", {
     style: {
       color: COLORS.textMuted
     },
@@ -3787,11 +5281,16 @@ function CloudPanel({
       borderColor: COLORS.border
     },
     className: "text-sm border rounded-full px-4 py-1.5"
-  }, "Restaurar desde la nube")), status && /*#__PURE__*/React.createElement("p", {
+  }, "Restaurar desde la nube")), /*#__PURE__*/React.createElement("p", {
     style: {
       color: COLORS.textMuted
     },
-    className: "text-xs mt-2"
+    className: "text-xs"
+  }, "La app también sincroniza sola cada pocos minutos si ya guardaste un token.")), status && /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: COLORS.textMuted
+    },
+    className: "text-xs mt-3"
   }, status)));
 }
 
@@ -3809,22 +5308,45 @@ const EMPTY_PROGRESS = {
   dictationDone: [],
   translationDone: [],
   clozeDone: [],
-  srs: {}
+  srs: {},
+  irregularVerbsDone: [],
+  idiomsLearned: [],
+  emojiCorrectCount: 0,
+  anagramsDone: [],
+  achievementsUnlocked: [],
+  timeAttackBest: 0,
+  grammarMistakes: {}
 };
 const KEY_PROGRESS = 'bridge-english-progress-v3';
 const KEY_TOKEN = 'bridge-english-gh-token';
 const KEY_GISTID = 'bridge-english-gh-gistid';
+const FONT_SIZE_MAP = {
+  pequeno: '87.5%',
+  normal: '100%',
+  grande: '112.5%'
+};
+const KEY_THEME = 'bridge-english-theme';
+const KEY_AUDIO_SPEED = 'bridge-english-audio-speed';
+const KEY_FONT_SIZE = 'bridge-english-font-size';
+const AUTO_SYNC_MS = 5 * 60 * 1000;
 function App() {
   const [view, setView] = useState('dashboard');
   const [progress, setProgress] = useState(EMPTY_PROGRESS);
   const [confirmReset, setConfirmReset] = useState(false);
-  const [cloudOpen, setCloudOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [token, setToken] = useState('');
   const [gistId, setGistId] = useState('');
+  const [theme, setThemeState] = useState('dark');
+  const [audioSpeed, setAudioSpeedState] = useState('normal');
+  const [fontSize, setFontSizeState] = useState('normal');
+  const progressRef = useRef(progress);
+  useEffect(() => {
+    progressRef.current = progress;
+  }, [progress]);
   useEffect(() => {
     let mounted = true;
     (async () => {
-      const [rawProgress, rawToken, rawGistId] = await Promise.all([storageGet(KEY_PROGRESS), storageGet(KEY_TOKEN), storageGet(KEY_GISTID)]);
+      const [rawProgress, rawToken, rawGistId, rawTheme, rawAudio, rawFont] = await Promise.all([storageGet(KEY_PROGRESS), storageGet(KEY_TOKEN), storageGet(KEY_GISTID), storageGet(KEY_THEME), storageGet(KEY_AUDIO_SPEED), storageGet(KEY_FONT_SIZE)]);
       if (!mounted) return;
       let loaded = EMPTY_PROGRESS;
       if (rawProgress) {
@@ -3844,14 +5366,31 @@ function App() {
       storageSet(KEY_PROGRESS, JSON.stringify(loaded));
       if (rawToken) setToken(rawToken);
       if (rawGistId) setGistId(rawGistId);
+      if (rawTheme) {
+        applyTheme(rawTheme);
+        setThemeState(rawTheme);
+      }
+      if (rawAudio) {
+        AUDIO_SETTINGS.rate = AUDIO_RATE_BY_SPEED[rawAudio] || 0.88;
+        setAudioSpeedState(rawAudio);
+      }
+      if (rawFont) setFontSizeState(rawFont);
     })();
     return () => {
       mounted = false;
     };
   }, []);
+  useEffect(() => {
+    document.documentElement.style.fontSize = FONT_SIZE_MAP[fontSize] || '100%';
+  }, [fontSize]);
   const persist = next => {
-    setProgress(next);
-    storageSet(KEY_PROGRESS, JSON.stringify(next));
+    const newlyUnlocked = ACHIEVEMENTS.filter(a => !next.achievementsUnlocked.includes(a.id) && a.check(next)).map(a => a.id);
+    const finalNext = newlyUnlocked.length ? {
+      ...next,
+      achievementsUnlocked: [...next.achievementsUnlocked, ...newlyUnlocked]
+    } : next;
+    setProgress(finalNext);
+    storageSet(KEY_PROGRESS, JSON.stringify(finalNext));
   };
   const toggleKnownWord = wordId => {
     const known = new Set(progress.knownWords);
@@ -3861,11 +5400,15 @@ function App() {
       knownWords: Array.from(known)
     });
   };
-  const saveGrammarScore = (lessonId, score) => persist({
+  const saveGrammarScore = (lessonId, score, wrongIdx) => persist({
     ...progress,
     grammarScores: {
       ...progress.grammarScores,
       [lessonId]: score
+    },
+    grammarMistakes: {
+      ...progress.grammarMistakes,
+      [lessonId]: wrongIdx || []
     }
   });
   const saveReadingScore = (passageId, score) => persist({
@@ -3905,6 +5448,34 @@ function App() {
       clozeDone: [...progress.clozeDone, id]
     });
   };
+  const markAnagram = idx => {
+    if (!progress.anagramsDone.includes(idx)) persist({
+      ...progress,
+      anagramsDone: [...progress.anagramsDone, idx]
+    });
+  };
+  const markVerb = idx => {
+    if (!progress.irregularVerbsDone.includes(idx)) persist({
+      ...progress,
+      irregularVerbsDone: [...progress.irregularVerbsDone, idx]
+    });
+  };
+  const markIdiom = idx => {
+    if (!progress.idiomsLearned.includes(idx)) persist({
+      ...progress,
+      idiomsLearned: [...progress.idiomsLearned, idx]
+    });
+  };
+  const markEmojiCorrect = () => persist({
+    ...progress,
+    emojiCorrectCount: (progress.emojiCorrectCount || 0) + 1
+  });
+  const finishTimeAttack = score => {
+    if (score > (progress.timeAttackBest || 0)) persist({
+      ...progress,
+      timeAttackBest: score
+    });
+  };
   const onReviewResult = (wordId, correct) => {
     const currentBox = progress.srs[wordId] ? progress.srs[wordId].box : -1;
     const nextEntry = scheduleNext(currentBox, correct);
@@ -3938,23 +5509,47 @@ function App() {
     ...EMPTY_PROGRESS,
     ...restored
   });
+  const setTheme = name => {
+    applyTheme(name);
+    setThemeState(name);
+    storageSet(KEY_THEME, name);
+  };
+  const setAudioSpeed = name => {
+    AUDIO_SETTINGS.rate = AUDIO_RATE_BY_SPEED[name] || 0.88;
+    setAudioSpeedState(name);
+    storageSet(KEY_AUDIO_SPEED, name);
+  };
+  const setFontSize = name => {
+    setFontSizeState(name);
+    storageSet(KEY_FONT_SIZE, name);
+  };
+  useEffect(() => {
+    if (!token) return;
+    const interval = setInterval(() => {
+      gistSync(token, gistId, progressRef.current).then(id => {
+        if (id !== gistId) saveGistId(id);
+      }).catch(() => {});
+    }, AUTO_SYNC_MS);
+    return () => clearInterval(interval);
+  }, [token, gistId]);
   const totalWords = VOCAB_CATEGORIES.reduce((sum, c) => sum + c.words.length, 0);
   const totalGrammar = GRAMMAR_LESSONS.length;
   const totalReading = READING_PASSAGES.length;
   const totalSpeaking = SPEAKING_PHRASES.length;
   const totalSentences = SENTENCE_EXERCISES.length;
-  const totalExercises = SPEAKING_PHRASES.length + TRANSLATION_ITEMS.length + CLOZE_ITEMS.length;
+  const totalExercises = SPEAKING_PHRASES.length + TRANSLATION_ITEMS.length + CLOZE_ITEMS.length + ANAGRAM_ITEMS.length;
   const doneWords = progress.knownWords.length;
   const doneGrammar = Object.keys(progress.grammarScores).length;
   const doneReading = Object.keys(progress.readingScores).length;
   const doneSpeaking = progress.practicedPhrases.length;
   const doneSentences = progress.sentencesCompleted.length;
-  const doneExercises = progress.dictationDone.length + progress.translationDone.length + progress.clozeDone.length;
+  const doneExercises = progress.dictationDone.length + progress.translationDone.length + progress.clozeDone.length + progress.anagramsDone.length;
   const totalAll = totalWords + totalGrammar + totalReading + totalSpeaking + totalSentences + totalExercises;
   const doneAll = doneWords + doneGrammar + doneReading + doneSpeaking + doneSentences + doneExercises;
   const overallPct = totalAll > 0 ? Math.round(doneAll / totalAll * 100) : 0;
   const streak = computeStreak(progress.visitDates);
   const dueCount = getDueWords(progress).length;
+  const level = computeLevel(computeXP(progress));
   return /*#__PURE__*/React.createElement("div", {
     style: {
       background: COLORS.bg,
@@ -3963,12 +5558,13 @@ function App() {
   }, /*#__PURE__*/React.createElement(Header, {
     view: view,
     setView: setView,
-    overallPct: overallPct,
+    level: level,
     streak: streak,
-    onOpenCloud: () => setCloudOpen(true)
+    onOpenSettings: () => setSettingsOpen(true)
   }), view === 'dashboard' && /*#__PURE__*/React.createElement(Dashboard, {
     setView: setView,
     dueCount: dueCount,
+    level: level,
     stats: {
       doneWords,
       totalWords,
@@ -3987,10 +5583,13 @@ function App() {
     onResetRequest: () => setConfirmReset(true)
   }), view === 'vocabulario' && /*#__PURE__*/React.createElement(VocabView, {
     progress: progress,
-    toggleKnownWord: toggleKnownWord
+    toggleKnownWord: toggleKnownWord,
+    onEmojiCorrect: markEmojiCorrect,
+    onLearnIdiom: markIdiom
   }), view === 'gramatica' && /*#__PURE__*/React.createElement(GrammarView, {
     progress: progress,
-    onComplete: saveGrammarScore
+    onComplete: saveGrammarScore,
+    onLearnVerb: markVerb
   }), view === 'lectura' && /*#__PURE__*/React.createElement(ReadingView, {
     progress: progress,
     onComplete: saveReadingScore
@@ -4004,19 +5603,31 @@ function App() {
     progress: progress,
     onDictation: markDictation,
     onTranslation: markTranslation,
-    onCloze: markCloze
+    onCloze: markCloze,
+    onAnagram: markAnagram
   }), view === 'repaso' && /*#__PURE__*/React.createElement(ReviewView, {
     progress: progress,
     onReviewResult: onReviewResult
-  }), cloudOpen && /*#__PURE__*/React.createElement(CloudPanel, {
-    onClose: () => setCloudOpen(false),
+  }), view === 'contrarreloj' && /*#__PURE__*/React.createElement(TimeAttackView, {
+    progress: progress,
+    onFinish: finishTimeAttack
+  }), view === 'logros' && /*#__PURE__*/React.createElement(AchievementsView, {
+    progress: progress
+  }), settingsOpen && /*#__PURE__*/React.createElement(SettingsPanel, {
+    onClose: () => setSettingsOpen(false),
     token: token,
     gistId: gistId,
     saveToken: saveToken,
     forgetToken: forgetToken,
     saveGistId: saveGistId,
     progress: progress,
-    applyRestoredProgress: applyRestoredProgress
+    applyRestoredProgress: applyRestoredProgress,
+    theme: theme,
+    setTheme: setTheme,
+    audioSpeed: audioSpeed,
+    setAudioSpeed: setAudioSpeed,
+    fontSize: fontSize,
+    setFontSize: setFontSize
   }), confirmReset && /*#__PURE__*/React.createElement("div", {
     style: {
       background: 'rgba(0,0,0,0.6)'
