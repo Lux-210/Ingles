@@ -296,9 +296,6 @@ const IconSettings = p => /*#__PURE__*/React.createElement(Icon, p, /*#__PURE__*
 const IconCloud = p => /*#__PURE__*/React.createElement(Icon, p, /*#__PURE__*/React.createElement("path", {
   d: "M7 18a4.5 4.5 0 0 1-.5-9 5.5 5.5 0 0 1 10.7-1.7A4 4 0 0 1 17 18H7Z"
 }));
-const IconFlame = p => /*#__PURE__*/React.createElement(Icon, p, /*#__PURE__*/React.createElement("path", {
-  d: "M12 2c1 3-2 4-2 7a4 4 0 0 0 8 0c0-1-.5-2-1-3 1 0 3 2 3 6a6 6 0 0 1-12 0c0-4 2-6 4-10Z"
-}));
 const IconX = p => /*#__PURE__*/React.createElement(Icon, p, /*#__PURE__*/React.createElement("line", {
   x1: "18",
   y1: "6",
@@ -3578,19 +3575,6 @@ function scrambleWord(word) {
 function todayKey() {
   return new Date().toISOString().slice(0, 10);
 }
-function computeStreak(visitDates) {
-  const set = new Set(visitDates);
-  let streak = 0;
-  const d = new Date();
-  while (true) {
-    const key = d.toISOString().slice(0, 10);
-    if (set.has(key)) {
-      streak++;
-      d.setDate(d.getDate() - 1);
-    } else break;
-  }
-  return streak;
-}
 
 /* --- Repetición espaciada (sistema de cajas tipo Leitner) --- */
 const BOX_INTERVALS = [1, 2, 4, 8, 16, 30];
@@ -3742,21 +3726,6 @@ const ACHIEVEMENTS = [{
   title: 'Buena pronunciación',
   description: 'Practica 10 frases en voz alta.',
   check: p => p.practicedPhrases.length >= 10
-}, {
-  id: 'streak-3',
-  title: 'Constancia',
-  description: 'Practica 3 días seguidos.',
-  check: p => computeStreak(p.visitDates) >= 3
-}, {
-  id: 'streak-7',
-  title: 'Una semana completa',
-  description: 'Practica 7 días seguidos.',
-  check: p => computeStreak(p.visitDates) >= 7
-}, {
-  id: 'streak-30',
-  title: 'Hábito imparable',
-  description: 'Practica 30 días seguidos.',
-  check: p => computeStreak(p.visitDates) >= 30
 }, {
   id: 'sentences-all',
   title: 'Constructor de oraciones',
@@ -4213,7 +4182,6 @@ function Header({
   view,
   setView,
   level,
-  streak,
   online,
   onOpenSettings
 }) {
@@ -4268,14 +4236,7 @@ function Header({
     "aria-hidden": "true"
   }), /*#__PURE__*/React.createElement("span", {
     className: "hidden sm:inline"
-  }, "Sin conexión")), streak > 0 && /*#__PURE__*/React.createElement("span", {
-    style: {
-      color: COLORS.amber
-    },
-    className: "flex items-center gap-1 text-xs sm:text-sm"
-  }, /*#__PURE__*/React.createElement(IconFlame, {
-    size: 16
-  }), streak), /*#__PURE__*/React.createElement("button", {
+  }, "Sin conexión")), /*#__PURE__*/React.createElement("button", {
     onClick: () => setView('logros'),
     style: {
       fontFamily: FONT_MONO,
@@ -6545,7 +6506,6 @@ const EMPTY_PROGRESS = {
   readingScores: {},
   practicedPhrases: [],
   sentencesCompleted: [],
-  visitDates: [],
   dictationDone: [],
   translationDone: [],
   clozeDone: [],
@@ -7038,11 +6998,6 @@ function App() {
           };
         } catch (e) {}
       }
-      const today = todayKey();
-      if (!loaded.visitDates.includes(today)) loaded = {
-        ...loaded,
-        visitDates: [...loaded.visitDates, today]
-      };
       setProgress(loaded);
       storageSet(KEY_PROGRESS, JSON.stringify(loaded));
       if (!loaded.levelTestDone) setShowLevelTest(true);
@@ -7245,7 +7200,6 @@ function App() {
   const totalAll = totalWords + totalGrammar + totalReading + totalSpeaking + totalSentences + totalExercises;
   const doneAll = doneWords + doneGrammar + doneReading + doneSpeaking + doneSentences + doneExercises;
   const overallPct = totalAll > 0 ? Math.round(doneAll / totalAll * 100) : 0;
-  const streak = computeStreak(progress.visitDates);
   const dueCount = getDueWords(progress).length;
   const mistakesCount = Object.values(progress.grammarMistakes || {}).reduce((sum, arr) => sum + (arr ? arr.length : 0), 0);
   const level = computeLevel(computeXP(progress));
@@ -7258,7 +7212,6 @@ function App() {
     view: view,
     setView: setView,
     level: level,
-    streak: streak,
     online: online,
     onOpenSettings: () => setSettingsOpen(true)
   }), view === 'dashboard' && /*#__PURE__*/React.createElement(Dashboard, {
