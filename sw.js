@@ -4,7 +4,7 @@
 
 /* Sube este número (v2, v3…) en cada despliegue nuevo: es lo que hace que
    los usuarios con la app ya instalada reciban la versión actualizada. */
-const CACHE_NAME = 'bridge-english-v4';
+const CACHE_NAME = 'bridge-english-v5';
 const CORE_ASSETS = [
   './',
   './index.html',
